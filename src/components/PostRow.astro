@@ -1,0 +1,28 @@
+---
+import type { Post } from '../lib/posts';
+import { fmtDate, postUrl } from '../lib/posts';
+import { TetraArt, TernArt } from './art';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const Art = post.data.art === 'tetranet' ? TetraArt : TernArt;
+---
+
+<a href={postUrl(post)} class="post-row">
+  <div class="art">
+    <Art card />
+  </div>
+  <div class="post-row__body">
+    <span class:list={['type-tag', post.data.type]}>
+      {post.data.type === 'research' ? 'Research' : 'Blog'}
+      <span style="margin-left:10px; color:var(--ink-faint); text-transform:none; letter-spacing:0.05em;">
+        {fmtDate(post.data.date)}
+      </span>
+    </span>
+    <h2>{post.data.title}</h2>
+    <p>{post.data.description}</p>
+  </div>
+</a>

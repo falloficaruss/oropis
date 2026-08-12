@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { postUrl } from '../lib/posts';
+
+const posts = (await getCollection('posts'))
+  .filter((p) => p.data.type === 'blog')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="Blog" active="/" description="Essays and explainers">
+  <div class="container">
+    <header class="page-head">
+      <p class="crumb">Oropis</p>
+      <h1>Blog</h1>
+      <p style="color:var(--ink-soft); margin:10px 0 0; max-width:520px;">
+        Essays and explainers alongside the research releases — same standards,
+        fewer equations.
+      </p>
+    </header>
+
+    <div class="post-list">
+      {posts.map((post) => (
+        <PostRow post={post} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

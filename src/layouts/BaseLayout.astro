@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/inter';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  active?: string;
+}
+
+const { title, description = 'Research and writing on small language models.', active } = Astro.props;
+
+const year = new Date().getFullYear();
+
+const navItems = [
+  { href: '/', label: 'Blog' },
+  { href: '/research', label: 'Research' },
+  { href: '/about', label: 'About' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} — Oropis</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__wrap">
+        <a class="wordmark plain" href="/">
+          Oropis<sup>◬</sup>
+        </a>
+        <nav class="main-nav">
+          {navItems.map((item) => (
+            <a href={item.href} class:list={[{ active: active === item.href }]}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__wrap">
+        <span class="meta">© {year} Oropis — research &amp; writing on small models</span>
+        <div class="socials">
+          <a href="/rss.xml">RSS</a>
+          <a href="https://github.com/falloficaruss" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://x.com/falloficarus22" target="_blank" rel="noopener">X</a>
+          <a href="mailto:norizzabhii@gmail.com">Email</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

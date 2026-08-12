@@ -1,0 +1,112 @@
+---
+const ink = '#1d1a15';
+const paper = '#faf8f3';
+const accentSoft = '#f4e3d8';
+const accent = '#b4522a';
+const gray = '#8a8377';
+const line = '#e3ded2';
+const dram = '#d8d2c4';
+
+interface Row {
+  name: string;
+  bits: string;
+  compute: number;
+  dram: number;
+  color: string;
+  prop?: boolean;
+  dim?: boolean;
+}
+
+const rows: Row[] = [
+  { name: 'Full precision', bits: '32.00', compute: 0.0531, dram: 6.0398, color: ink },
+  { name: 'Ternary, idealized coding', bits: '1.58', compute: 0.0156, dram: 0.9362, color: gray },
+  { name: 'Ternary, 2-bit packed', bits: '2.00', compute: 0.0156, dram: 1.0067, color: gray, dim: true },
+  { name: 'Uniform 2-bit', bits: '2.00', compute: 0.0164, dram: 1.0067, color: '#a3a096' },
+  { name: 'Quaternary c = 1/4', bits: '2.00', compute: 0.0172, dram: 1.0067, color: accent, prop: true },
+  { name: 'Quaternary c = 1/2', bits: '2.00', compute: 0.0164, dram: 1.0067, color: accent, prop: true, dim: true },
+];
+
+const x0 = 300;
+const x1 = 1150;
+const vmin = 0.01;
+const vmax = 10;
+
+const x = (v: number) => x0 + ((Math.log10(v) - Math.log10(vmin)) / (Math.log10(vmax) - Math.log10(vmin))) * (x1 - x0);
+
+const rowH = 46;
+const gap = 16;
+const y0 = 190;
+
+const grid = [0.01, 0.1, 1, 10];
+---
+
+<svg
+  viewBox="0 0 1200 560"
+  role="img"
+  aria-label="Stacked bar chart of analytical energy per decoded token: compute versus DRAM weight reads"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect width="1200" height="560" fill={paper} />
+
+  <text x="80" y="88" font-family="IBM Plex Mono, monospace" font-size="14" letter-spacing="3" fill={ink}>
+    ANALYTICAL ENERGY PER DECODE TOKEN
+  </text>
+  <text x="80" y="112" font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="2" fill={gray}>
+    45NM OPERATION COSTS · 20 PJ/BIT DRAM RE-READ · LOG SCALE
+  </text>
+
+  <!-- proposed panel -->
+  <rect x={x0 - 14} y={y0 + 4 * (rowH + gap) - 16} width={x1 - x0 + 28} height={2 * (rowH + gap) - 8} rx="10" fill={accentSoft} opacity="0.55" />
+
+  {grid.map((gv) => (
+    <g>
+      <line x1={x(gv)} y1={y0 - 24} x2={x(gv)} y2={y0 + rows.length * (rowH + gap) - 8} stroke={line} stroke-width="1" stroke-dasharray={gv === 1 ? 'none' : '2 5'} />
+      <text x={x(gv) + 5} y={y0 - 32} font-family="IBM Plex Mono, monospace" font-size="12" fill={gray}>
+        {gv === 0.01 ? '0.01' : gv === 0.1 ? '0.1' : gv === 10 ? '10' : '1'} mJ
+      </text>
+    </g>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = y0 + i * (rowH + gap);
+    const barW = x(r.dram + r.compute) - x0;
+    const computeW = Math.max(x(r.dram + r.compute) - x(r.compute), 2);
+    const startX = x(r.compute);
+    return (
+      <g>
+        <line x1={x0} y1={y + rowH} x2={x1} y2={y + rowH} stroke={line} stroke-width="1" />
+        <text x="80" y={y + rowH - 12} font-family="Newsreader Variable, Georgia, serif" font-size="18" fill={ink}>
+          {r.name}
+        </text>
+        <text x="80" y={y + rowH + 6} font-family="IBM Plex Mono, monospace" font-size="11" fill={gray}>
+          {r.bits} bits/wt
+        </text>
+        <rect x={x0} y={y + 4} width={barW} height={rowH - 8} rx="8" fill={dram} opacity={r.dim ? 0.85 : 1} />
+        <rect x={startX} y={y + 4} width={computeW} height={rowH - 8} rx="3" fill={r.color} opacity={r.dim ? 0.85 : 1} />
+        <text x={x0 + barW + 14} y={y + rowH - 14} font-family="IBM Plex Mono, monospace" font-size="15" fill={ink}>
+          {(r.dram + r.compute).toFixed(4)}
+        </text>
+      </g>
+    );
+  })}
+
+  <!-- annotation -->
+  <g>
+    <text x="500" y="80" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1" fill={accent} text-anchor="middle">
+      QUATERNARY ≈ 1.02 MJ/TOKEN ≈ 16.8% OF FULL PRECISION
+    </text>
+    <line x1="686" y1="86" x2="640" y2="150" stroke={accent} stroke-width="1" stroke-dasharray="2 4" />
+  </g>
+
+  <!-- legend -->
+  <g>
+    <rect x="80" y={y0 + rows.length * (rowH + gap) + 8} width="18" height="18" rx="4" fill={dram} />
+    <text x="108" y={y0 + rows.length * (rowH + gap) + 23} font-family="IBM Plex Mono, monospace" font-size="13" fill={ink}>
+      DRAM weight reads
+    </text>
+    <rect x="260" y={y0 + rows.length * (rowH + gap) + 8} width="18" height="18" rx="4" fill={accent} />
+    <text x="288" y={y0 + rows.length * (rowH + gap) + 23} font-family="IBM Plex Mono, monospace" font-size="13" fill={ink}>
+      compute (right-edge cap)
+    </text>
+  </g>
+</svg>

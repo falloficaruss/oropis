@@ -1,0 +1,89 @@
+---
+const ink = '#1d1a15';
+const paper = '#faf8f3';
+const accent = '#b4522a';
+const teal = '#2c6e66';
+const gray = '#8a8377';
+const line = '#e3ded2';
+
+// bits (log2 domain 1.58..16) vs relative quality (monotone increasing, saturating)
+const x0 = 220;
+const x1 = 1080;
+const y0 = 430;
+const y1 = 120;
+
+const l2 = (v: number) => Math.log2(v);
+const x = (v: number) => x0 + ((l2(v) - l2(1.25)) / (l2(16) - l2(1.25))) * (x1 - x0);
+const q = (bits: number) => 1 - 0.42 * Math.exp(-l2(bits) / 3.6);
+const y = (v: number) => y1 + (1 - v) * (y0 - y1);
+
+const bitsRange = [1.58, 2, 4, 8, 16];
+
+const curve = Array.from({ length: 200 }, (_, i) => {
+  const b = 1.25 * Math.pow(16 / 1.25, i / 199);
+  return `${i === 0 ? 'M' : 'L'} ${x(b).toFixed(1)} ${y(q(b)).toFixed(1)}`;
+}).join(' ');
+---
+
+<svg
+  viewBox="0 0 1200 520"
+  role="img"
+  aria-label="Curve of relative model quality versus bits per weight, with ternary and two-bit points marked"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect width="1200" height="520" fill={paper} />
+
+  <text x="80" y="88" font-family="IBM Plex Mono, monospace" font-size="14" letter-spacing="3" fill={ink}>
+    QUALITY VS BITS PER WEIGHT
+  </text>
+  <text x="80" y="112" font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="2" fill={gray}>
+    ILLUSTRATIVE FRONTIER · NOT A SINGLE CONTROLLED RUN
+  </text>
+
+  <!-- low-bit plateau shade -->
+  <rect x={x0} y={y1 - 8} width={x(3.4) - x0} height={y0 - y1 + 16} fill={accent} opacity="0.05" />
+  <text x={x(1.75)} y={y1 - 26} font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="1" fill={accent} text-anchor="middle">
+    LOW-BIT PLATEAU
+  </text>
+
+  <!-- axes -->
+  <line x1={x0} y1={y0} x2={x1 + 10} y2={y0} stroke={ink} stroke-width="2" />
+  <line x1={x0} y1={y0} x2={x0} y2={y1 - 10} stroke={ink} stroke-width="2" />
+
+  {bitsRange.map((b) => (
+    <g>
+      <line x1={x(b)} y1={y0} x2={x(b)} y2={y0 + 6} stroke={ink} stroke-width="2" />
+      <text x={x(b)} y={y0 + 24} font-family="IBM Plex Mono, monospace" font-size="13" fill={ink} text-anchor="middle">
+        {b}
+      </text>
+    </g>
+  ))}
+  <text x={x1 + 4} y={y0 + 24} font-family="IBM Plex Mono, monospace" font-size="13" fill={gray} text-anchor="end">
+    bits/weight →
+  </text>
+
+  <text x={x0 - 14} y={y0 + 6} font-family="IBM Plex Mono, monospace" font-size="13" fill={ink} text-anchor="end">
+    quality
+  </text>
+
+  <!-- curve -->
+  <path d={curve} fill="none" stroke={ink} stroke-width="2.5" opacity="0.85" />
+
+  <!-- points -->
+  <g>
+    <circle cx={x(16)} cy={y(q(16))} r="7" fill={ink} />
+    <text x={x(16)} y={y(q(16)) - 16} font-family="IBM Plex Mono, monospace" font-size="12" fill={ink} text-anchor="middle">
+      FP16 · 16
+    </text>
+    <circle cx={x(8)} cy={y(q(8))} r="4.5" fill={gray} />
+    <circle cx={x(4)} cy={y(q(4))} r="4.5" fill={gray} />
+    <circle cx={x(2)} cy={y(q(2))} r="7" fill={teal} />
+    <text x={x(2)} y={y(q(2)) + 24} font-family="IBM Plex Mono, monospace" font-size="12" fill={teal} text-anchor="middle">
+      2 · FOUR STATES
+    </text>
+    <circle cx={x(1.58)} cy={y(q(1.58))} r="7" fill={accent} />
+    <text x={x(1.58)} y={y(q(1.58)) - 16} font-family="IBM Plex Mono, monospace" font-size="12" fill={accent} text-anchor="middle">
+      1.58 · THREE STATES
+    </text>
+  </g>
+</svg>

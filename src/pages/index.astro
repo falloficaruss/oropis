@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getAllPosts, fmtDate } from '../lib/posts';
+
+const posts = await getAllPosts();
+const researchCount = posts.filter((p) => p.data.type === 'research').length;
+const blogCount = posts.length - researchCount;
+---
+
+<BaseLayout title="Blog" active="/">
+  <div class="container">
+    <section class="hero">
+      <p class="meta">
+        Oropis<span class="sep">·</span>Research &amp; writing on small models
+      </p>
+      <h1>Small weights,<br />sharp ideas.</h1>
+      <p class="lede">
+        Notes and releases on efficient inference, low-bit LLMs, and the
+        hardware they land on — published as they happen.
+      </p>
+    </section>
+  </div>
+
+  <div class="container">
+    <div class="filter-bar" data-filter-bar>
+      <button class="active" data-filter="all">All<span class="meta" style="margin-left:8px;">{posts.length}</span></button>
+      <button data-filter="research">Research<span class="meta" style="margin-left:8px;">{researchCount}</span></button>
+      <button data-filter="blog">Blog<span class="meta" style="margin-left:8px;">{blogCount}</span></button>
+    </div>
+
+    <div class="post-grid" data-post-grid>
+      {posts.map((post) => (
+        <div data-post data-type={post.data.type}>
+          <PostCard post={post} />
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const bar = document.querySelector('[data-filter-bar]');
+  const items = document.querySelectorAll('[data-post]');
+
+  bar?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('button');
+    if (!btn) return;
+    const filter = btn.dataset.filter;
+    bar.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    items.forEach((item) => {
+      const el = item as HTMLElement;
+      const show = filter === 'all' || el.dataset.type === filter;
+      el.style.display = show ? '' : 'none';
+    });
+  });
+</script>

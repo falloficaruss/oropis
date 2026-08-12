@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllPosts, postUrl, fmtDate } from '../lib/posts';
+
+const posts = await getAllPosts();
+---
+
+<BaseLayout title="About" active="/about" description="About Abhishek Shinde — AI developer and researcher">
+  <div class="container">
+    <header class="about-hero">
+      <p class="meta">Oropis<span class="sep">·</span>About</p>
+      <h1>Abhishek Shinde</h1>
+      <p class="role">ai dev &amp; researcher</p>
+      <p style="max-width:560px; color:var(--ink-soft); margin:0;">
+        Oropis is where I publish my research and writing on efficient
+        inference, low-bit LLMs, and the systems that run them. This page is
+        where the rest of the work-in-progress lives.
+      </p>
+    </header>
+
+    <section class="about-section" id="about">
+      <span class="section-label">About Me</span>
+      <div class="prose">
+        <p>
+          <strong>Short version.</strong> I build and study small language
+          models — the kind that fit in a phone, an edge device, or a hobby
+          budget — and the quantization schemes that let them run there.
+        </p>
+        <p>
+          <strong>Longer version.</strong> My work sits at the intersection of
+          efficient arithmetic and practical systems: weight alphabets,
+          multiply-free kernels, and the energy accounting that decides whether
+          an idea ships. When I'm not training 9M-parameter pilots, I read
+          broadly across mechanics of optimization and hardware.
+        </p>
+        <p>
+          Drop me a note anytime — mail is the fastest way to reach me.
+        </p>
+      </div>
+    </section>
+
+    <section class="about-section" id="timeline">
+      <span class="section-label">Timeline</span>
+      <ul class="timeline">
+        <li>
+          <span class="when">Jul 2026</span>
+          <div class="what">
+            <h3>TetraNet: power-of-two quaternary weights</h3>
+            <p>
+              Shift-friendly two-bit weight grids with lower TinyStories
+              perplexity than a matched ternary baseline — <a href="/posts/tetranet">published on Oropis</a>.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="when">2025 — 2026</span>
+          <div class="what">
+            <h3>AI development and research</h3>
+            <p>
+              Building with LLMs end to end: training small models,
+              quantization research, and product work around agents and
+              interfaces.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="when">2024</span>
+          <div class="what">
+            <h3>First experiments in language modeling</h3>
+            <p>
+              TinyStories-scale pilots, manual attention poking, and the
+              discovery that low-bit weights are an interface problem, not just
+              an accuracy problem.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="when">Earlier</span>
+          <div class="what">
+            <h3>Computers, then curiosity</h3>
+            <p>
+              A long prehistory of tinkering that eventually pointed at
+              machine learning — placeholder for the full story.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="about-section" id="projects">
+      <span class="section-label">Projects</span>
+      <div class="project-grid">
+        <a class="project-card" href="/posts/tetranet">
+          <h3>TetraNet</h3>
+          <p>
+            Two-bit quaternary LLM weights with a shift-based dot product —
+            the pilot study behind the current research release.
+          </p>
+          <span class="tags"><span>quantization</span><span>pytorch</span><span>c++</span><span>triton</span></span>
+        </a>
+        <span class="project-card" style="cursor:default;">
+          <h3>Next project — placeholder</h3>
+          <p>
+            What ships next from the lab. This card is where the current
+            work-in-progress will land.
+          </p>
+          <span class="tags"><span>wip</span></span>
+        </span>
+        <span class="project-card" style="cursor:default;">
+          <h3>Another project — placeholder</h3>
+          <p>
+            A second slot for a portfolio item — human, ML, or hardware
+            adjacent.
+          </p>
+          <span class="tags"><span>wip</span></span>
+        </span>
+      </div>
+    </section>
+
+    <section class="about-section" id="blogs">
+      <span class="section-label">Blogs &amp; Writing</span>
+      <div class="post-list" style="padding-bottom:0;">
+        {posts.map((post) => (
+          <a class="post-row" href={postUrl(post)} style="grid-template-columns:1fr; border-top:1px solid var(--line);">
+            <div class="post-row__body">
+              <span class="type-tag" class:list={post.data.type}>
+                {post.data.type === 'research' ? 'Research' : 'Blog'}
+                <span style="margin-left:10px; color:var(--ink-faint); text-transform:none; letter-spacing:0.05em;">
+                  {fmtDate(post.data.date)}
+                </span>
+              </span>
+              <h2 style="font-size:1.18rem;">{post.data.title}</h2>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="about-section" id="contact">
+      <span class="section-label">Elsewhere</span>
+      <div class="social-row">
+        <a href="https://github.com/falloficaruss" target="_blank" rel="noopener">github.com/falloficaruss</a>
+        <a href="https://x.com/falloficarus22" target="_blank" rel="noopener">x.com/falloficarus22</a>
+        <a href="mailto:norizzabhii@gmail.com">norizzabhii@gmail.com</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

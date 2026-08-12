@@ -1,0 +1,88 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { TetraArt, TernArt } from '../../components/art';
+import { getAllPosts, fmtDate, postUrl } from '../../lib/posts';
+import type { Post } from '../../lib/posts';
+import { render } from 'astro:content';
+
+export const getStaticPaths = (async () => {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const Art = post.data.art === 'tetranet' ? TetraArt : TernArt;
+
+const all = await getAllPosts();
+const idx = all.findIndex((p) => p.id === post.id);
+const prev = idx > 0 ? all[idx - 1] : null;
+const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+---
+
+<BaseLayout title={post.data.title} description={post.data.description} active="">
+  <article class="container">
+    <header class="post-header">
+      <a class="backlink" href="/">← All posts</a>
+
+      <div class="prose">
+        <span class:list={['type-tag', post.data.type]}>
+          {post.data.type === 'research' ? 'Research' : 'Blog'}
+        </span>
+        <h1>{post.data.title}</h1>
+        <p class="description">{post.data.description}</p>
+        <p class="byline">
+          <span class="mono" style="font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint);">
+            {post.data.type === 'research' ? 'Technical release' : 'Essay'}
+            <span style="padding:0 0.5em;">·</span>
+            {fmtDate(post.data.date)}
+          </span>
+          <br />
+          {post.data.author}
+          {post.data.type === 'research' && ' — correspondence: norizzabhii@gmail.com'}
+        </p>
+      </div>
+    </header>
+
+    <div class="prose post-hero-art">
+      <Art />
+    </div>
+
+    <div class="post-body prose">
+      <Content />
+    </div>
+
+    {
+      (prev || next) && (
+        <nav class="prose" style="margin-top:64px; display:flex; justify-content:space-between; gap:20px; border-top:1px solid var(--line); padding-top:24px;">
+          {prev ? (
+            <a class="plain" href={postUrl(prev)}>
+              <span class="meta">← Older</span>
+              <br />
+              <span class="serif" style="font-size:1.05rem;">{prev.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next ? (
+            <a class="plain" href={postUrl(next)} style="text-align:right;">
+              <span class="meta">Newer →</span>
+              <br />
+              <span class="serif" style="font-size:1.05rem;">{next.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )
+    }
+  </article>
+</BaseLayout>

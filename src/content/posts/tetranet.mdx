@@ -1,0 +1,244 @@
+---
+title: "TetraNet: Power-of-Two Quaternary Weights for Small Decoder-Only Language Models"
+description: "A symmetric quaternary weight grid {−1, −c, c, 1} with power-of-two intermediates reclaims the fourth state of a two-bit register while keeping the dot product multiply-free."
+date: 2026-07-17
+type: research
+tags: [quantization, efficient inference, low-bit LLMs, TinyStories]
+author: Abhishek Shinde
+art: tetranet
+---
+
+import Sec from '../../components/Sec.astro';
+import Tldr from '../../components/Tldr.astro';
+import Outline from '../../components/Outline.astro';
+import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+import Refs from '../../components/Refs.astro';
+import Cite from '../../components/Cite.astro';
+import GridSchematic from '../../components/art/GridSchematic.astro';
+import PplChart from '../../components/art/PplChart.astro';
+import EnergyChart from '../../components/art/EnergyChart.astro';
+
+<Tldr>
+<li>
+  Softmax-free, multiply-free: with the symmetric quaternary grid $\mathcal{Q}_c = \{ -1, -c, c, 1 \}$ and $c \in \{1/4, 1/2\}$, the core dot product needs only signed integer adds and bit-shifts.
+</li>
+<li>
+  <b>Both fixed quaternary grids beat the matched BitNet-style ternary baseline</b> in a controlled 9.4M-parameter TinyStories pilot — <b>c = 1/4 is lower by 2.29 perplexity points</b> (76.73 vs. 79.03).
+</li>
+<li>
+  Under the stated analytical model, fixed two-bit quaternary storage costs essentially the same total energy as ternary in a two-bit container — <b>~1.02 mJ/token, ~16.8% of full precision</b> — while using the otherwise-idle fourth state.
+</li>
+<li>
+  The evidence is a single-run, small-scale pilot. It does not establish statistical significance, scaling behavior, measured energy, or a wall-clock win over optimized dense or ternary libraries.
+</li>
+</Tldr>
+
+<Outline>
+<li><a href="#1-introduction">Introduction</a> — the unused state in a two-bit register</li>
+<li><a href="#2-related-work">Related Work</a> — BitNet b1.58 and the kernel problem</li>
+<li><a href="#3-method">Method</a> — scaled quaternary quantization, shift-oriented inference</li>
+<li><a href="#4-experimental-setup">Experimental Setup</a> — model, training protocol, baselines</li>
+<li><a href="#5-results">Results</a> — language modeling quality, analytical energy</li>
+<li><a href="#6-implementation-status-and-limitations">Implementation Status and Limitations</a></li>
+<li><a href="#7-conclusion">Conclusion</a></li>
+</Outline>
+
+<Sec num="1" title="Introduction" id="1-introduction" />
+
+Native low-bit language models seek to reduce the cost of storing and applying the many linear-projection weights in a transformer. BitNet b1.58 showed that ternary weights can be a useful large-scale training target [3]; efficient ternary inference systems have subsequently demonstrated that the kernel implementation is as important as the weight alphabet [7]. This work explores a deliberately narrow question: **if a deployment allocates exactly two bits of storage per projection weight, can the fourth state improve the weight grid while preserving a shift-friendly inner product?**
+
+We answer this question with the symmetric quaternary set
+
+$$
+\mathcal{Q}_c = \{ -1, -c, c, 1 \}, \qquad c \in \{\tfrac14, \tfrac12\}.
+$$
+
+Unlike a uniformly spaced four-level grid, both intermediate magnitudes are powers of two. Given integer activations, multiplication by $c$ in the core dot product is therefore a signed right shift. The proposal does not eliminate all floating-point work: per-layer scale application, normalization, attention, and the language-model head remain floating point in this prototype.
+
+The empirical scope is intentionally modest. We train a 9.4M-parameter Llama-style decoder [6] on TinyStories [1], compare it with full-precision, ternary, and uniform-four-level baselines, and freeze the validation and energy artifacts in the repository. The principal findings are:
+
+- Both fixed quaternary grids improve over the repository's matched BitNet-style ternary baseline on the frozen validation subset; $c = 1/4$ is lower by 2.29 perplexity points.
+- Under the stated analytical memory and operation model, fixed two-bit quaternary storage has essentially the same estimated total energy as ternary weights stored in a two-bit container, while using a fourth state.
+- The evidence is a single-run, small-scale pilot. It does not establish statistical significance, scaling behavior, measured energy, or a wall-clock advantage over optimized dense or ternary libraries.
+
+<Sec num="2" title="Related Work" id="2-related-work" />
+
+BitNet b1.58 is a native ternary language-model approach in which weights take values in $\{-1, 0, 1\}$ [3]. Its reported large-scale results are not directly comparable to this study: our ternary comparator is a compact, local implementation with abs-mean scaling and a clipped straight-through estimator (STE), not a reproduction of the complete BitNet b1.58 recipe. Bitnet.cpp illustrates the separate systems problem of mapping low-bit weights to efficient edge inference kernels [7]. We provide correctness-tested C++ and Triton proof-of-concept kernels, but do not compare them with Bitnet.cpp or highly tuned BLAS libraries.
+
+The model uses a conventional small decoder design with rotary position embeddings [5] and SwiGLU feed-forward blocks [4]. TinyStories was designed as a controlled setting for studying small language models [1]. Finally, our energy accounting follows the order-of-magnitude operation and memory-access cost methodology popularized by Horowitz [2]; it should be read as a sensitivity model, not a measurement on contemporary hardware.
+
+<Sec num="3" title="Method" id="3-method" />
+
+### 3.1 · Scaled quaternary quantization
+
+For a latent projection weight matrix $W$, the implementation computes a detached layerwise scale
+
+$$
+\gamma = \mathrm{mean}_{ij}\, |W_{ij}|, \qquad x = W / \max(\gamma, 10^{-8}).
+$$
+
+Let $b = (1 + c)/2$. The quantized weight used in the forward pass is
+
+$$
+\widehat{W} = \gamma \, q_c(x), \qquad
+q_c(x) = \begin{cases}
+-1 & x \le -b, \\
+-c & -b < x \le 0, \\
+c & 0 < x \le b, \\
+1 & x > b.
+\end{cases}
+$$
+
+The backward pass uses a clipped STE, passing the incoming derivative to $x$ only when $|x| \le \tau$, with $\tau = 1$ in all fixed-$c$ experiments. The fixed variants register $c$ as a buffer rather than optimizing it.
+
+<Figure label="Figure 1" caption="The quantizer. Two thresholds at ±(1+c)/2 split the axis into four regions; the two-bit codewords 00 / 01 / 10 / 11 map onto +1 / −1 / +c / −c. The c states cost one or two arithmetic shifts.">
+  <GridSchematic />
+</Figure>
+
+### 3.2 · Shift-oriented inference representation
+
+For $c = 1/2$ and $c = 1/4$, a two-bit code can store the four states as $00 \mapsto +1$, $01 \mapsto -1$, $10 \mapsto +c$, and $11 \mapsto -c$. The included specialized path quantizes activations to signed int8-derived integer codes, packs four weights per byte, accumulates in int32, and evaluates the intermediate states with one or two arithmetic right shifts. The final activation and weight scales are applied after accumulation. This describes the available inference path, not the floating-point training/evaluation operator used to produce the perplexities in Section 5.
+
+<Callout kind="note">
+<span class="callout-label">Why powers of two</span>
+<p style="margin:0">
+A non-power-of-two grid (for example uniform four-level $\{-1, -\tfrac13, \tfrac13, 1\}$) already exists in two-bit hardware, but its intermediate states require real multipliers or lookup tables. Restricting $c \in \{\frac14, \frac12\}$ collapses multiplication by $c$ to a signed right shift — the property that keeps the dot product multiply-free.
+</p>
+</Callout>
+
+<Sec num="4" title="Experimental Setup" id="4-experimental-setup" />
+
+### 4.1 · Model and training protocol
+
+The table below summarizes the frozen experiment configuration. The tokenizer is a byte-level BPE tokenizer trained with a 4,096-token vocabulary. All Q, K, V, output, gate, up, and down projections are replaced by the chosen linear class. Token embeddings, the tied output head, normalization, rotary embedding operations, and attention products remain full precision.
+
+We did not set or record a random seed and store one final run per condition. Consequently, differences below are point estimates rather than multi-seed estimates with confidence intervals.
+
+| Item | Value |
+| --- | --- |
+| Architecture | Decoder-only Llama-style transformer |
+| Parameters | 9,441,592 with tied embedding/output weights |
+| Layers / hidden size / heads / FFN | 8 / 256 / 8 / 1,024 |
+| Vocabulary / max sequence length | 4,096 / 512 |
+| Training data | First 100,000 TinyStories training stories |
+| Training duration | One epoch; ~3.3M tokens |
+| Optimizer | AdamW; lr 3 × 10⁻⁴; weight decay 0.1 |
+| AdamW betas / clipping | (0.9, 0.95) / global norm 1.0 |
+| Batch size / accumulation | 8 / 4 |
+| Precision | bfloat16 AMP |
+| Validation | First 2,500 TinyStories-valid stories; 180 blocks of length 512 |
+
+<Callout kind="note">
+<span class="callout-label">Table 1</span>
+<p style="margin:0">
+Pilot-study configuration. All linear projections are replaced by the chosen weight class; embeddings, the tied output head, normalization, rotary embeddings, and attention remain full precision.
+</p>
+</Callout>
+
+### 4.2 · Baselines and metrics
+
+We compare five conditions. **Full precision** uses ordinary projection linears. **Ternary** uses abs-mean scaling, values $\{-1, 0, 1\}$, and the same clipped STE; we refer to it as "BitNet-style ternary" only as a local comparator. **Uniform 2-bit** uses values $\{-1, -\tfrac13, \tfrac13, 1\}$; it is an informative but imperfect ablation because its implementation uses an abs-maximum scale while the ternary and quaternary implementations use abs-mean scale. The remaining conditions are the proposed fixed $c = 1/4$ and $c = 1/2$ grids.
+
+Validation perplexity is the exponentiated mean token cross entropy. The frozen evaluation concatenates tokenized stories, then evaluates 180 non-overlapping blocks; it records 92,160 nominal input tokens. We report no generation-quality evaluation.
+
+For energy, we split per-token operations into quantized projections, floating-point attention score/value products, and the full-precision output head. The model assigns 4.6 pJ to an FP32 multiply-add, 0.13 pJ to a ternary select/negate plus integer add, 0.23 pJ to an int8 multiply plus add or the $c = 1/2$ shift path, and 0.33 pJ to the $c = 1/4$ shift path. It adds a 20 pJ/bit DRAM cost for one full decode-time read of all weights, including full-precision embeddings and one FP32 scale per quantized projection. These choices make memory dominant and should not be generalized to an on-chip-cache regime.
+
+<Sec num="5" title="Results" id="5-results" />
+
+### 5.1 · Language modeling quality
+
+The figure below and the table that follows use the frozen `ppl 10m.json` artifact. Both proposed variants have lower perplexity than the matched ternary run. The strongest point estimate is $c = 1/4$, at **76.73 versus 79.03** for BitNet-style ternary. Uniform 2-bit is also lower than the ternary comparator, but the differing scale statistic means this table does not isolate grid geometry alone. All low-bit models remain materially behind the full-precision condition.
+
+<Figure label="Figure 2" caption="Frozen validation perplexity on the 2,500-story TinyStories subset. Lower is better. One run per condition; not a statistical comparison.">
+  <PplChart />
+</Figure>
+
+| Baseline | Loss | PPL | Δ vs. ternary |
+| --- | ---: | ---: | ---: |
+| Full precision | 4.1779 | 65.23 | −13.80 |
+| BitNet-style ternary | 4.3698 | 79.03 | 0.00 |
+| Uniform 2-bit | 4.3522 | 77.65 | −1.38 |
+| **Quaternary c = 1/4** | **4.3403** | **76.73** | **−2.29** |
+| Quaternary c = 1/2 | 4.3512 | 77.57 | −1.45 |
+
+<Callout kind="note">
+<span class="callout-label">Table 2</span>
+<p style="margin:0">
+Frozen validation results. Negative values in the final column are improvements over the repository's BitNet-style ternary baseline.
+</p>
+</Callout>
+
+The repository also contains a learned-$c$ exploration with an L1 multi-well snapping objective. It snapped all 56 scale parameters to $1/4$ or $1/2$ but gave 124.16 perplexity on the same evaluation. We treat this as a negative result, and do not use it as evidence for a learned heterogeneous design.
+
+### 5.2 · Analytical compute and memory energy
+
+The architecture has 8,388,608 quantized-projection MACs per generated token at context length 512, 2,097,152 full-precision attention MACs, and 1,048,576 full-precision output-head MACs. The figure below visualizes the resulting accounting. Under the DRAM re-read assumption, the two fixed quaternary variants have a total estimate of approximately **1.02 mJ/token, about 16.8% of the full-precision estimate**. This ratio is principally caused by fewer bits read from DRAM, not by the small difference between a shift and an integer multiply in the compute term.
+
+<Figure label="Figure 3" caption="Analytical energy model for a decode token at context length 512. The model combines 45nm operation costs with a 20 pJ/bit DRAM weight-read assumption. Not a physical power measurement.">
+  <EnergyChart />
+</Figure>
+
+| Baseline | Proj. bits/wt | Compute (mJ) | DRAM (mJ) | Total (mJ) |
+| --- | ---: | ---: | ---: | ---: |
+| Full precision | 32.00 | 0.0531 | 6.0398 | 6.0929 |
+| Ternary, idealized coding | 1.58 | 0.0156 | 0.9362 | 0.9518 |
+| Ternary, 2-bit packed | 2.00 | 0.0156 | 1.0067 | 1.0222 |
+| Uniform 2-bit | 2.00 | 0.0164 | 1.0067 | 1.0231 |
+| Quaternary c = 1/4 | 2.00 | 0.0172 | 1.0067 | 1.0239 |
+| Quaternary c = 1/2 | 2.00 | 0.0164 | 1.0067 | 1.0231 |
+
+<Callout kind="note">
+<span class="callout-label">Table 3</span>
+<p style="margin:0">
+Analytical energy per decode token. The "2-bit packed" ternary row uses the same model with ternary projection storage changed from its idealized 1.58 bits/weight to a fixed two-bit container. Embeddings remain FP32.
+</p>
+</Callout>
+
+The distinction between the two ternary rows matters. The idealized 1.58-bit row gives ternary a 7.0% total-energy advantage over the fixed two-bit quaternary grids. At equal two-bit packing, the difference is below 0.2% in this model. This is a representation-storage comparison only; the current ternary implementation in the proof-of-concept kernel uses int8 codes, not an optimized entropy-coded ternary format.
+
+<Sec num="6" title="Implementation Status and Limitations" id="6-implementation-status-and-limitations" />
+
+The official code implementation repository contains a C++ extension and optional Triton kernels that pack quaternary weights four per byte and implement the signed-shift accumulation path. Tests check these kernels against their integer reference computations. It also contains CPU microbenchmarks and end-to-end generation harnesses. Those measurements use equal-effort research kernels, only three end-to-end runs in the frozen artifact, and lack the hardware metadata and optimized baselines needed for a systems claim. We therefore do not report wall-clock speedups in this paper.
+
+Several limitations materially constrain interpretation:
+
+- The study has **one seed, one small model size, one short training run, and one domain**. Perplexity differences of one to two points require multi-seed and larger-scale confirmation.
+- The uniform 2-bit comparator differs in its scaling statistic, so it does not cleanly separate the effect of four states from the effect of the quantizer geometry.
+- Perplexity is evaluated with floating-point quantized weights. The specialized inference path adds int8 activation quantization and integer shift rounding, neither of which has been evaluated end to end for quality.
+- The energy numbers use 45nm operation constants and a full DRAM weight re-read per token. Cache residency, hardware process, vectorization, scale handling, and memory traffic can all change absolute and relative energy.
+- The local ternary baseline is BitNet-style, not a controlled reproduction of BitNet b1.58, and the prototype is not a comparison against Bitnet.cpp or vendor GEMM libraries.
+
+The next revision should fix seeds, train multiple runs at substantially larger model and token budgets, align scale choices across ablations, evaluate the integer inference path for quality, and benchmark packed ternary and quaternary kernels against production implementations on documented hardware.
+
+<Sec num="7" title="Conclusion" id="7-conclusion" />
+
+This initial study evaluates a simple alternative to ternary weights under a fixed two-bit storage assumption. Fixed power-of-two quaternary grids retain a shift-oriented dot-product path and produced lower frozen validation perplexity than a matched local ternary baseline in a 9.4M TinyStories pilot. At equal two-bit storage, the analytical energy model places ternary and quaternary at near parity; the proposed grid's motivation is therefore **improved representation use rather than a claimed energy or throughput win**. The result is promising enough to justify a larger controlled study, but its current evidence should be read with the limitations above.
+
+> **TetraNet in one line:** a two-bit register holds four states; with $c \in \{\frac14, \frac12\}$ the extra two cost nothing but a shift — and they beat the ternary baseline that leaves them idle.
+
+### Reproducibility note
+
+Checkpoints and the TinyStories data are not included in the source tree, so full training or evaluation replay requires supplying them separately. The frozen validation (`ppl 10m.json`) and energy artifacts define the numbers reported above.
+
+<Refs>
+<li>Ronen Eldan and Yuanzhi Li. <em>TinyStories: How Small Can Language Models Be and Still Speak Coherent English?</em> arXiv preprint arXiv:2305.07759, 2023.</li>
+<li>Mark Horowitz. <em>Computing's energy problem (and what we can do about it).</em> ISSCC Digest of Technical Papers, pp. 10–14, 2014.</li>
+<li>Shuming Ma, Hongyu Wang, Lingxiao Ma, Lei Wang, Wenhui Wang, Shaohan Huang, Li Dong, Ruiping Wang, Jilong Xue, and Furu Wei. <em>The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits.</em> arXiv preprint arXiv:2402.17764, 2024.</li>
+<li>Noam Shazeer. <em>GLU Variants Improve Transformer.</em> arXiv preprint arXiv:2002.05202, 2020.</li>
+<li>Jianlin Su, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. <em>RoFormer: Enhanced Transformer with Rotary Position Embedding.</em> arXiv preprint arXiv:2104.09864, 2021.</li>
+<li>Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothee Lacroix, Baptiste Roziere, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. <em>LLaMA: Open and Efficient Foundation Language Models.</em> arXiv preprint arXiv:2302.13971, 2023.</li>
+<li>Jinheng Wang, Hansong Zhou, Ting Song, Shijie Cao, Yan Xia, Ting Cao, Jianyu Wei, Shuming Ma, Hongyu Wang, and Furu Wei. <em>Bitnet.cpp: Efficient Edge Inference for Ternary LLMs.</em> arXiv preprint arXiv:2502.11880, 2025.</li>
+</Refs>
+
+<Cite
+  bibtex={`@techreport{shinde2026tetranet,
+  title   = {TetraNet: Power-of-Two Quaternary Weights for
+             Small Decoder-Only Language Models},
+  author  = {Shinde, Abhishek},
+  year    = {2026},
+  month   = jul,
+  note    = {Published on Oropis},
+  url     = {https://oropis.com/posts/tetranet/}
+}`}
+/>

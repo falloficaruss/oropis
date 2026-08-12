@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+
+const posts = (await getCollection('posts'))
+  .filter((p) => p.data.type === 'research')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="Research" active="/research" description="Research releases">
+  <div class="container">
+    <header class="page-head">
+      <p class="crumb">Oropis</p>
+      <h1>Research</h1>
+      <p style="color:var(--ink-soft); margin:10px 0 0; max-width:520px;">
+        Technical releases from the lab — small models, low-bit arithmetic,
+        and the systems that run them.
+      </p>
+    </header>
+
+    <div class="post-list">
+      {posts.map((post) => (
+        <PostRow post={post} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
