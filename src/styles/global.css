@@ -119,6 +119,18 @@ svg {
   color: var(--ink);
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand-logo {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
 .wordmark sup {
   font-family: var(--mono);
   font-size: 0.52rem;
