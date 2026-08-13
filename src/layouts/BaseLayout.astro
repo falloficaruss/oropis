@@ -11,13 +11,13 @@ interface Props {
   active?: string;
 }
 
-const { title, description = 'Research and writing on small language models.', active } = Astro.props;
+const { title, description = 'Research and writing on small language models, hardware arithmetic, and efficient inference.', active } = Astro.props;
 
 const year = new Date().getFullYear();
 
 const navItems = [
-  { href: '/', label: 'Blog' },
   { href: '/research', label: 'Research' },
+  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ];
 ---
@@ -33,13 +33,14 @@ const navItems = [
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title} — Oropis</title>
+    <title>{title} — Oropis Research</title>
   </head>
   <body>
     <header class="site-header">
       <div class="container site-header__wrap">
-        <a class="brand plain" href="/">
-          <img class="brand-logo" src="/logo.png" alt="Oropis" width="120" height="51" />
+        <a class="brand-group" href="/">
+          <span class="wordmark">Oropis</span>
+          <span class="wordmark-tag">Research</span>
         </a>
         <nav class="main-nav">
           {navItems.map((item) => (
@@ -47,6 +48,9 @@ const navItems = [
               {item.label}
             </a>
           ))}
+          <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener" class="nav-cta">
+            View Code <span style="font-size:1.05em">↗</span>
+          </a>
         </nav>
       </div>
     </header>
@@ -56,13 +60,50 @@ const navItems = [
     </main>
 
     <footer class="site-footer">
-      <div class="container site-footer__wrap">
-        <span class="meta">© {year} Oropis — research &amp; writing on small models</span>
-        <div class="socials">
-          <a href="/rss.xml">RSS</a>
-          <a href="https://github.com/falloficaruss" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://x.com/falloficarus22" target="_blank" rel="noopener">X</a>
-          <a href="mailto:norizzabhii@gmail.com">Email</a>
+      <div class="container">
+        <div class="site-footer__grid">
+          <div class="footer-brand">
+            <span class="wordmark">Oropis</span>
+            <p>
+              An independent research lab investigating efficient inference, low-bit arithmetic, and hardware-aligned language models.
+            </p>
+          </div>
+
+          <div class="footer-col">
+            <h4>Research</h4>
+            <ul>
+              <li><a href="/posts/tetranet">TetraNet Paper</a></li>
+              <li><a href="/posts/era-of-1-bit-llms">1-bit LLMs &amp; Kernels</a></li>
+              <li><a href="/research">All Publications</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Topics</h4>
+            <ul>
+              <li><a href="/research">Quantization Grids</a></li>
+              <li><a href="/research">Shift-Oriented Kernels</a></li>
+              <li><a href="/research">Energy Sensitivity Modeling</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Connect</h4>
+            <ul>
+              <li><a href="https://github.com/falloficaruss" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://x.com/falloficarus22" target="_blank" rel="noopener">X / Twitter</a></li>
+              <li><a href="/rss.xml">RSS Feed</a></li>
+              <li><a href="mailto:norizzabhii@gmail.com">Contact Email</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="site-footer__bottom">
+          <span>© {year} Oropis Research — Small weights, sharp ideas.</span>
+          <div style="display:flex; gap:20px;">
+            <a href="/rss.xml">RSS</a>
+            <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener">Open Source</a>
+          </div>
         </div>
       </div>
     </footer>

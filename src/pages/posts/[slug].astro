@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { TetraArt, TernArt } from '../../components/art';
+import { TetraArt, TernArt, NnueArt, MultiArt } from '../../components/art';
 import { getAllPosts, fmtDate, postUrl } from '../../lib/posts';
 import type { Post } from '../../lib/posts';
 import { render } from 'astro:content';
@@ -20,7 +20,11 @@ interface Props {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
-const Art = post.data.art === 'tetranet' ? TetraArt : TernArt;
+const Art =
+  post.data.art === 'tetranet' ? TetraArt : post.data.art === 'nnue' ? NnueArt : post.data.art === 'multiagent' ? MultiArt : TernArt;
+
+const backLabel = post.data.type === 'research' ? 'Research' : 'Blog';
+const backHref = post.data.type === 'research' ? '/research' : '/blog';
 
 const all = await getAllPosts();
 const idx = all.findIndex((p) => p.id === post.id);
@@ -31,12 +35,15 @@ const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 <BaseLayout title={post.data.title} description={post.data.description} active="">
   <article class="container">
     <header class="post-header">
-      <a class="backlink" href="/">← All posts</a>
+      <a class="backlink" href={backHref}>← {backLabel}</a>
 
       <div class="prose">
-        <span class:list={['type-tag', post.data.type]}>
-          {post.data.type === 'research' ? 'Research' : 'Blog'}
-        </span>
+        <div class="post-header__meta-row">
+          <span class:list={['type-tag', post.data.type]}>
+            {post.data.type === 'research' ? 'Research' : 'Blog'}
+          </span>
+          <span class="meta">{fmtDate(post.data.date)}</span>
+        </div>
         <h1>{post.data.title}</h1>
         <p class="description">{post.data.description}</p>
         <p class="byline">
@@ -44,10 +51,9 @@ const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
             {post.data.type === 'research' ? 'Technical release' : 'Essay'}
             <span style="padding:0 0.5em;">·</span>
             {fmtDate(post.data.date)}
+            <span style="padding:0 0.5em;">·</span>
+            {post.data.author}
           </span>
-          <br />
-          {post.data.author}
-          {post.data.type === 'research' && ' — correspondence: norizzabhii@gmail.com'}
         </p>
       </div>
     </header>
@@ -62,21 +68,19 @@ const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
     {
       (prev || next) && (
-        <nav class="prose" style="margin-top:64px; display:flex; justify-content:space-between; gap:20px; border-top:1px solid var(--line); padding-top:24px;">
+        <nav class="prose post-nav">
           {prev ? (
-            <a class="plain" href={postUrl(prev)}>
+            <a class="plain post-nav__link" href={postUrl(prev)}>
               <span class="meta">← Older</span>
-              <br />
-              <span class="serif" style="font-size:1.05rem;">{prev.data.title}</span>
+              <span class="serif post-nav__title">{prev.data.title}</span>
             </a>
           ) : (
             <span />
           )}
           {next ? (
-            <a class="plain" href={postUrl(next)} style="text-align:right;">
+            <a class="plain post-nav__link post-nav__link--right" href={postUrl(next)}>
               <span class="meta">Newer →</span>
-              <br />
-              <span class="serif" style="font-size:1.05rem;">{next.data.title}</span>
+              <span class="serif post-nav__title">{next.data.title}</span>
             </a>
           ) : (
             <span />

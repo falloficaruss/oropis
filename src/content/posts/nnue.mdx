@@ -1,0 +1,146 @@
+---
+title: "NNUE: The 22-Megabyte Neural Network That Saved Chess Engines"
+description: "How a 41,024 × 256 × 32 × 1 fixed-point network, recomputed only where it changed, let a CPU engine run a 10-million-node search with a learned evaluation, and what it teaches about low-bit inference."
+date: 2026-08-13
+type: blog
+tags: [NNUE, efficient inference, quantization, chess, explainer]
+author: Abhishek Shinde
+art: nnue
+---
+
+import Sec from '../../components/Sec.astro';
+import Tldr from '../../components/Tldr.astro';
+import Outline from '../../components/Outline.astro';
+import Figure from '../../components/Figure.astro';
+import NnueArt from '../../components/art/NnueArt.astro';
+
+<Tldr>
+<li>
+  A chess engine's evaluation runs <b>millions of times per second</b> inside the search tree. In 2020, Stockfish replaced decades of handcrafted evaluation code with a tiny neural net, 41,024 × 256 × 32 × 1, and gained ~50 Elo at a stroke [3].
+</li>
+<li>
+  The "Efficiently Updatable" in NNUE means exactly one thing: a position rarely changes more than <b>two input features</b> at a time, so instead of re-running the network you only add and subtract the two changed rows of the first layer: <b>512 multiply-accumulates</b> instead of 10.5 million [1, 2].
+</li>
+<li>
+  The network is <b>fixed-point from birth</b>: 16-bit weights, 8-bit activations, 32-bit accumulators, and a 4,096-entry lookup table for the sigmoid. Quantization wasn't a compression step; it was the design that made a learned evaluation affordable inside a search loop.
+</li>
+<li>
+  For the low-bit LLM crowd, NNUE is the existence proof that matters: <b>train-time-aware, aggressively quantized networks have been winning in production</b> on commodity hardware since 2018, and the winning move was the same one we keep circling in LLM inference: stop re-reading what didn't change.
+</li>
+</Tldr>
+
+<Outline>
+<li><a href="#1-the-evaluation-problem">The evaluation problem</a>: a function called 10 million times a second</li>
+<li><a href="#2-the-old-world">The old world</a>: handcrafted evaluation and where it stopped</li>
+<li><a href="#3-the-network">The network</a>: halfkp features and a 1×256×32×1 fixed-point net</li>
+<li><a href="#4-the-trick">The trick</a>: incremental updates, 512 FMAs per position</li>
+<li><a href="#5-from-shogi-to-chess">From shogi to chess</a>: Stockfish 12 and the CPU comeback</li>
+<li><a href="#6-how-the-net-is-made">How the net is made</a>: self-play data and GPU training</li>
+<li><a href="#7-what-llms-can-borrow">What LLMs can borrow</a>: the low-bit lessons</li>
+<li><a href="#8-since-2020">Since 2020</a>: buckets, bigger nets, and the second hardware revolution</li>
+</Outline>
+
+<Figure label="Figure 1" caption="NNUE in one picture: ~41,000 sparse inputs feed a 256-unit hidden layer whose rows are kept as a live accumulator. A non-king move flips exactly two features, so only two rows move; layers two and three re-run in full because they are trivial. Redrawn after the 2018 shogi original [1] and the Stockfish port [2].">
+  <NnueArt />
+</Figure>
+
+<Sec num="1" title="The evaluation problem" id="1-the-evaluation-problem" />
+
+A chess engine is a search loop with a scoring function at its center. Alpha–beta search walks a tree of moves, millions of leaves per second on modern hardware, and at every leaf it must answer one question: *who is better, and by how much?* That answer is the evaluation.
+
+The number of times the evaluator runs is hard to overstate. A strong engine on a 16-core machine sustains somewhere in the single-digit millions of *nodes* per second at tournament time controls, and every node that isn't decided by a transposition table lookup or a tactical extension gets a full evaluation call. Even a modest 2 million nodes per second means the evaluation function must complete in **under 500 nanoseconds on average**, and that budget includes memory latency, function call overhead, and everything else the search does around it.
+
+Two consequences follow. First, the evaluation cannot be a big neural network in the modern sense. A transformer block with millions of parameters is comically out of the question; even a modest dense net of, say, 1024 hidden units multiplied by 768 inputs would take tens of microseconds per call, three orders of magnitude over budget. Second, the evaluation cannot afford to be *expensive in a way that scales with position complexity*. Most positions are calm; a handful are wild. The evaluator's worst case has to stay inside the budget too, or search gets choppy.
+
+For decades, the answer was a handcrafted formula. Then in 2018, a shogi programmer named Yu Nasu published a different answer: a neural network that costs almost nothing to run because it only ever recomputes the part of itself that actually changed [1]. Two years later, that trick (NNUE, for *efficiently updatable neural network*) was running inside Stockfish, and it is the reason the strongest chess engine in the world is a fixed-point net of about 10.5 million parameters that fits in 22 megabytes.
+
+<Sec num="2" title="The old world" id="2-the-old-world" />
+
+Before NNUE, the state of the art was the *handcrafted evaluation*: a large hand-designed sum of features, refined over decades. A typical strong engine scored a position as a weighted combination of material, piece–square tables (a bonus for each piece on each square), pawn structure terms (doubled, isolated, passed, backward pawns), king safety, mobility, rooks on open files, bishop pairs, and dozens of smaller terms.
+
+These functions worked, remarkably well, in fact. Chess engines with handcrafted evaluations reached grandmaster-plus strength before any neural network did, purely on the strength of search plus a well-tuned formula. The tuning problem was solved with the Texel method [4]: play a large number of self-play games, label positions by outcome, and fit the weights with gradient descent against a logistic function of the score difference. It is the same recipe, recognizably, as training a model; the "model" just happened to be a fixed, human-designed feature vector of a few hundred weights.
+
+The problem was that the feature vector was capped by human imagination. Every new idea had to be written down as a term, and every term interacted with every other term in ways the tuners couldn't see. By the late 2010s, the consensus was that handcrafted evaluation had hit a plateau, and the alternative looked even worse. AlphaZero [5] had shown in 2017 that a deep convolutional network could play chess and shogi beyond human level with no handcrafted knowledge at all, but its network was big, ran on GPUs and TPUs, and evaluated positions at a rate of tens of thousands per second, a rate that would have been a catastrophic regression for a CPU engine whose search was built for millions. Neural evaluation and CPU search were, in effect, seen as mutually exclusive.
+
+<Sec num="3" title="The network" id="3-the-network" />
+
+NNUE was Nasu's answer for shogi in 2018 [1], and the Stockfish port by Hisayori Noda (nodchip) brought the same design to chess in 2020 [2]. The architecture is deceptively small:
+
+$$
+\underbrace{41{,}024}_{\text{halfkp features}} \times \underbrace{256}_{\text{hidden}} \times \underbrace{32}_{\text{hidden}} \times \underbrace{1}_{\text{value}}.
+$$
+
+**The input features ("halfkp").** The network is not fed a board representation; it is fed a *one-hot encoding of chess facts*: for the side to move, each input bit encodes "my king is on square *k*, and there is a piece of type *p* on square *s*." That is $64$ king squares × $(64 \text{ squares} \times 10 \text{ piece types} + 1) = 41{,}024$ possible facts, of which only a handful are true in any given position; for a typical middle game, a few dozen. The "+1" is the king's own square, which is how the network knows where its own king stands without a piece sitting on it. ("Half" because only *one* king, the side to move's own, participates in the encoding, rather than both kings; the encoding is asymmetric by design and is flipped with the side to move.)
+
+**The layers.** Layer one maps the 41,024 one-hot bits to 256 hidden units: a 41,024 × 256 matrix of signed 16-bit weights, stored as *rows*, one row per feature. This is where the old handcrafted knowledge went to die: each row is a *learned piece–square table*: the embedding of "white knight on e4 with the white king on g1" into a 256-dimensional feature space. Layer two is 256 × 32, layer three is 32 × 1, and the single output passes through a sigmoid and is scaled into centipawns [2, 3].
+
+**The fixed-point design.** Every number in the network is quantized, and it was quantized from the start, because the network had to run on the same CPU cores as the search:
+
+- **Weights:** 16-bit signed integers (layer one) and 8-bit signed integers (layers two and three), with per-layer scale factors.
+- **Activations:** 8-bit signed integers between layers.
+- **Accumulators:** 32-bit integers, so the hidden layer can accumulate thousands of weighted terms without overflow.
+- **The sigmoid:** not computed, *looked up*. A 4,096-entry table (a couple of tens of kilobytes) turns the final 32-to-1 product into a probability at the cost of a memory read [2, 6].
+
+None of this was a post-training compression exercise. The quantization is the design: weights are chosen by training with the same rounding they will experience in production, and the kernel is written in SIMD-friendly int16/int8 arithmetic with the activations clipped to range. The whole net is about 10.5 million parameters and 22 megabytes, and the first-layer matrix alone (41,024 × 256 × 2 bytes) is nearly all of it.
+
+That number should ring a bell for regular readers of this site: **a 22 MB, 10.5M-parameter network has roughly the weight budget of a heavily-quantized 3B LLM layer.** The difference is that NNUE is asked to do something infinitely narrower than language modeling (evaluate a chess position), and it gets to be cheap because of that narrowness. But it is also cheap because of something structural, which is the real trick.
+
+<Sec num="4" title="The trick" id="4-the-trick" />
+
+Here is the observation that gives the network its name. Consider two chess positions separated by one move. Almost everything about them is identical: the same 31 pieces, the same pawn structure, the same king squares. In the halfkp encoding, a non-king move changes **exactly two features**: the moved piece's old square turns off, and its new square turns on.
+
+Now look at what a full evaluation of the network does: it computes all 256 hidden units as a sum over *all* 41,024 features: 10.5 million multiply-accumulates. But because the input is a one-hot encoding, the contribution of each feature to the hidden layer is simply *one row of the weight matrix*. If only two features changed between evaluations, then the entire hidden layer changed in only two rows' worth of values:
+
+$$
+a^\prime_h = a_h + w_{f_1,h} \cdot \Delta x_{f_1} + w_{f_2,h} \cdot \Delta x_{f_2},
+$$
+
+where the deltas are +1 for the piece's new square and −1 for its old square. **Two rows of 256 weights each: 512 multiply-accumulates**, versus 10.5 million for the full forward pass. That is a factor of roughly twenty thousand, and it is the entire point of the design.
+
+The engine maintains the 256 hidden-unit values as a live **accumulator**. When a move is made in search, the accumulator is updated in place (subtract one row, add another) in a few dozen SIMD instructions. The 256→32 and 32→1 layers are then recomputed in full, but they are tiny: 256 × 32 + 32 = 8,224 multiply-accumulates. The grand total for a typical evaluation is under **9,000 MACs**, over a thousand times cheaper than the naive network.
+
+There is one expensive case: when the *king* moves, every feature's index changes (features are indexed by the king's square), so the entire first layer must be recomputed: 10.5 million MACs. That is a real but rare event; engines accept it, and it still completes in well under a millisecond on SIMD hardware. Search trees are full of non-king moves (the vast majority of legal moves at any ply), so the amortized cost is the cheap path.
+
+This is the deeper lesson, and it is a memory lesson, not a compute lesson. The full forward pass isn't slow because of the arithmetic; 10.5M int16 MACs is nothing to a CPU. It is slow because it must **read 22 MB of weights for every evaluation**, and at millions of evaluations per second that traffic is impossible. The incremental update reads two rows (a few hundred bytes), and the rest of the network (8,224 MACs across 256 × 32 + 32 weights) fits comfortably in cache. NNUE is, in the terms this site keeps returning to, a *memory-bound* problem that was solved by *not re-reading what didn't change*.
+
+<Sec num="5" title="From shogi to chess" id="5-from-shogi-to-chess" />
+
+Nasu built NNUE for shogi in 2018 and demonstrated it in the YaneuraOu engine [1]. The chess port arrived in 2020: nodchip's adaptation passed the Stockfish test gauntlet (fishtest) with a self-play gain in the neighborhood of 50–60 Elo, was merged into master in July 2020, and shipped as the default evaluation of Stockfish 12 that September [2, 3].
+
+The timing was perfect, because the chess world was in the middle of its own neural schism. AlphaZero had shown that deep learning could master chess from scratch [5], and the open-source answer to AlphaZero, Leela Chess Zero, was running big residual networks on GPUs and beating classical engines in long time controls. Classical engines' answer had been "search is enough." NNUE's answer was subtler: *it's not the size of the net that matters, it's the cost of calling it.*
+
+Leela's strength came with a hardware tax: GPUs, or huge CPU inference engines, to feed a network through a search that wanted millions of evaluations. NNUE collapsed the cost of a neural evaluation to something a CPU could absorb (a few hundred nanoseconds), which let the best classical search machinery (Stockfish's alpha–beta, its transposition tables, its move ordering, its pruning) keep working exactly as before, with a better scoring function plugged in underneath.
+
+The result was decisive. Stockfish 12 immediately dominated the TCEC superfinal against Leela in December 2020 [7], and the engines-and-hardware narrative of the previous three years ("GPUs beat CPUs because networks beat formulas") flipped. The strongest chess engine in the world ran on commodity CPUs, evaluated positions with a neural network, and called that network ~10 million times per second. Nobody had believed all three facts could be true at once.
+
+<Sec num="6" title="How the net is made" id="6-how-the-net-is-made" />
+
+Training an NNUE is, at a high level, the same loop as training anything else, with three production-grade details worth noting.
+
+**Data.** The training positions come from engine self-play: hundreds of millions of games and positions generated by strong Stockfish playing itself, with game results as labels. For the modern pipeline this data is curated and deduplicated: Stockfish's fishtest-generated game data and the training tooling in the official `nnue-pytorch` repository [8].
+
+**Labels.** Early NNUE nets (the original shogi nets, and Stockfish 12's) were trained with mean-squared error against a score target. Modern nets use a softmax over win/draw/loss probabilities (the WDL formulation), which turns the final evaluation into a well-calibrated game-theoretic estimate rather than an arbitrary centipawn number [8]. The output is still scaled back into centipawns for the search to consume, but the objective is now a probability.
+
+**Augmentation.** Chess positions are invariant under mirroring and color swap (mostly; castling and the side to move complicate the naive version). The training pipeline exploits the symmetries to multiply the effective dataset by a large factor, which is how a "700 million position" budget becomes the equivalent of several billion symmetric samples. Data augmentation of exactly this kind is one of the quiet reasons a 10.5M-parameter net can generalize from self-play.
+
+And crucially for the low-bit theme: **the network is trained quantized.** The training loop emulates the 16-bit/8-bit integer rounding that production will use: a *straight-through-estimator-style* trick that anyone who has trained a ternary or quaternary LLM will recognize instantly. The weights are regularized toward the values they will actually take at inference time, so the rounding is an anticipated part of the model, not a surprise inflicted on it afterwards.
+
+<Sec num="7" title="What LLMs can borrow" id="7-what-llms-can-borrow" />
+
+Read the NNUE story with the low-bit LLM lens on, and it maps almost one-to-one onto the arguments this site has been making about 1-bit and two-bit LLMs [9, 10].
+
+**Quantization is a training decision, not a compression step.** NNUE never had a "full-precision version." Its 16-bit weights and 8-bit activations were the design from the first commit, and the training recipe internalized the rounding. This is the same conclusion the 1-bit LLM line reached: *quantize during training, and the network learns to be robust to its own discrete weights* [9]. NNUE is the existence proof that this works in a shipping product: 10.5M parameters, fixed-point, no escapes.
+
+**The binding constraint is memory traffic, not FLOPs.** The naive NNUE forward pass is slow because it reads 22 MB of weights per evaluation; the incremental update reads hundreds of bytes. Bitnet.cpp and the low-bit literature make the same claim for LLMs: a 4.6 pJ multiply-add is nothing next to the 20 pJ per bit of DRAM traffic [10]. NNUE shows what "solved the memory problem" looks like when it is taken seriously: it is not faster arithmetic, it is *less re-reading*.
+
+**The kernel is the product.** NNUE's power lives as much in the SIMD kernel, the accumulator layout, and the sigmoid lookup table as in the network itself. The shogi original and the chess port were kernel projects as much as ML projects, exactly the "for low-bit LLMs, the kernel is the product" claim from our earlier essay [9].
+
+**Sparsity and update locality are the real frontier.** The deep insight of NNUE is not that its network is small, but that *positions change slowly*, so evaluation can be differential. LLMs have no analogue of "two features flip per token": every token re-reads every weight, and that is precisely why LLM inference remains memory-bound while chess evaluation is not. But the design pattern survives: if you can structure a computation so that only a delta needs re-reading, the memory wall stops being a wall.
+
+<Sec num="8" title="Since 2020" id="8-since-2020" />
+
+NNUE has not stood still, and its evolution tracks the same direction the LLM world keeps pushing: *more capacity, same discipline*. Where Stockfish 12 used a single 256-unit accumulator and a 22 MB net, modern Stockfish runs **16 king buckets** (one accumulator per king-square region, so the net can specialize its evaluation by where the king lives) with larger hidden layers (512 units and up) and nets that have grown toward 40 MB and beyond [3, 11]. The architecture's heart is unchanged: sparse one-hot inputs, an incrementally updated first layer, fixed-point weights, a lookup-table nonlinearity, and a tiny tail. The Δ-update trick is load-bearing in every version.
+
+The ideas have also spread beyond chess and shogi. Any domain with sparse, slowly-changing state and a hard per-call latency budget is a candidate, and the general lesson (evaluate differentially; quantize at design time; keep the hot path in cache) has been re-derived, independently, in everything from recommendation systems to real-time control networks.
+
+For this site, though, the canonical status of NNUE is simpler. When people argue that extreme low-bit networks "can't be production-grade," the correct response is not a paper; it is a chess engine. Ten million fixed-point evaluations a second, in a 22-megabyte budget, running on the same CPU that runs the search, has been winning tournaments since 2020. The low-bit LLM question is whether the same discipline scales to 7 billion parameters. The chess answer was: *only if you stop re-reading what didn't change*, and for LLMs, everything changes, every token. That is the honest difference, and it is exactly the problem worth working on.

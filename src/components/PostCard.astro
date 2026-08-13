@@ -1,26 +1,53 @@
 ---
 import type { Post } from '../lib/posts';
 import { fmtDate, postUrl } from '../lib/posts';
-import { TetraArt, TernArt } from './art';
+import { TetraArt, TernArt, NnueArt, MultiArt } from './art';
 
 interface Props {
   post: Post;
+  featured?: boolean;
 }
 
-const { post } = Astro.props;
-const Art = post.data.art === 'tetranet' ? TetraArt : TernArt;
+const { post, featured = false } = Astro.props;
+const Art =
+  post.data.art === 'tetranet' ? TetraArt : post.data.art === 'nnue' ? NnueArt : post.data.art === 'multiagent' ? MultiArt : TernArt;
+const readLabel = post.data.type === 'research' ? 'Read publication' : 'Read essay';
 ---
 
-<a href={postUrl(post)} class="post-card">
-  <div class="art">
-    <Art card />
-  </div>
-  <div class="post-card__body">
-    <span class:list={['type-tag', post.data.type]}>
-      {post.data.type === 'research' ? 'Research' : 'Blog'}
-    </span>
-    <h3>{post.data.title}</h3>
-    <p>{post.data.description}</p>
-    <span class="meta">{fmtDate(post.data.date)}</span>
-  </div>
-</a>
+{featured ? (
+  <a href={postUrl(post)} class="featured-publication">
+    <div class="art-container">
+      <Art card />
+    </div>
+    <div class="featured-publication__body">
+      <div class="featured-publication__meta">
+        <span class:list={['type-tag', post.data.type]}>
+          {post.data.type === 'research' ? 'Research Release' : 'Blog Essay'}
+        </span>
+        <span class="meta">{fmtDate(post.data.date)}</span>
+      </div>
+      <h3>{post.data.title}</h3>
+      <p>{post.data.description}</p>
+      <span class="featured-publication__link">
+        {readLabel} <span class="arrow">→</span>
+      </span>
+    </div>
+  </a>
+) : (
+  <a href={postUrl(post)} class="post-card">
+    <div class="art">
+      <Art card />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta-row">
+        <span class:list={['type-tag', post.data.type]}>
+          {post.data.type === 'research' ? 'Research' : 'Blog'}
+        </span>
+        <span class="meta">{fmtDate(post.data.date)}</span>
+      </div>
+      <h3>{post.data.title}</h3>
+      <p>{post.data.description}</p>
+      <span class="post-card__read">{readLabel} <span class="arrow">→</span></span>
+    </div>
+  </a>
+)}

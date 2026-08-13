@@ -24,10 +24,10 @@ import EnergyChart from '../../components/art/EnergyChart.astro';
   Softmax-free, multiply-free: with the symmetric quaternary grid $\mathcal{Q}_c = \{ -1, -c, c, 1 \}$ and $c \in \{1/4, 1/2\}$, the core dot product needs only signed integer adds and bit-shifts.
 </li>
 <li>
-  <b>Both fixed quaternary grids beat the matched BitNet-style ternary baseline</b> in a controlled 9.4M-parameter TinyStories pilot — <b>c = 1/4 is lower by 2.29 perplexity points</b> (76.73 vs. 79.03).
+  <b>Both fixed quaternary grids beat the matched BitNet-style ternary baseline</b> in a controlled 9.4M-parameter TinyStories pilot, with <b>c = 1/4 lower by 2.29 perplexity points</b> (76.73 vs. 79.03).
 </li>
 <li>
-  Under the stated analytical model, fixed two-bit quaternary storage costs essentially the same total energy as ternary in a two-bit container — <b>~1.02 mJ/token, ~16.8% of full precision</b> — while using the otherwise-idle fourth state.
+  Under the stated analytical model, fixed two-bit quaternary storage costs essentially the same total energy as ternary in a two-bit container: <b>~1.02 mJ/token, ~16.8% of full precision</b>, while using the otherwise-idle fourth state.
 </li>
 <li>
   The evidence is a single-run, small-scale pilot. It does not establish statistical significance, scaling behavior, measured energy, or a wall-clock win over optimized dense or ternary libraries.
@@ -35,11 +35,11 @@ import EnergyChart from '../../components/art/EnergyChart.astro';
 </Tldr>
 
 <Outline>
-<li><a href="#1-introduction">Introduction</a> — the unused state in a two-bit register</li>
-<li><a href="#2-related-work">Related Work</a> — BitNet b1.58 and the kernel problem</li>
-<li><a href="#3-method">Method</a> — scaled quaternary quantization, shift-oriented inference</li>
-<li><a href="#4-experimental-setup">Experimental Setup</a> — model, training protocol, baselines</li>
-<li><a href="#5-results">Results</a> — language modeling quality, analytical energy</li>
+<li><a href="#1-introduction">Introduction</a>: the unused state in a two-bit register</li>
+<li><a href="#2-related-work">Related Work</a>: BitNet b1.58 and the kernel problem</li>
+<li><a href="#3-method">Method</a>: scaled quaternary quantization, shift-oriented inference</li>
+<li><a href="#4-experimental-setup">Experimental Setup</a>: model, training protocol, baselines</li>
+<li><a href="#5-results">Results</a>: language modeling quality, analytical energy</li>
 <li><a href="#6-implementation-status-and-limitations">Implementation Status and Limitations</a></li>
 <li><a href="#7-conclusion">Conclusion</a></li>
 </Outline>
@@ -103,7 +103,7 @@ For $c = 1/2$ and $c = 1/4$, a two-bit code can store the four states as $00 \ma
 <Callout kind="note">
 <span class="callout-label">Why powers of two</span>
 <p style="margin:0">
-A non-power-of-two grid (for example uniform four-level $\{-1, -\tfrac13, \tfrac13, 1\}$) already exists in two-bit hardware, but its intermediate states require real multipliers or lookup tables. Restricting $c \in \{\frac14, \frac12\}$ collapses multiplication by $c$ to a signed right shift — the property that keeps the dot product multiply-free.
+A non-power-of-two grid (for example uniform four-level $\{-1, -\tfrac13, \tfrac13, 1\}$) already exists in two-bit hardware, but its intermediate states require real multipliers or lookup tables. Restricting $c \in \{\frac14, \frac12\}$ collapses multiplication by $c$ to a signed right shift. That is the property that keeps the dot product multiply-free.
 </p>
 </Callout>
 
@@ -215,7 +215,7 @@ The next revision should fix seeds, train multiple runs at substantially larger 
 
 This initial study evaluates a simple alternative to ternary weights under a fixed two-bit storage assumption. Fixed power-of-two quaternary grids retain a shift-oriented dot-product path and produced lower frozen validation perplexity than a matched local ternary baseline in a 9.4M TinyStories pilot. At equal two-bit storage, the analytical energy model places ternary and quaternary at near parity; the proposed grid's motivation is therefore **improved representation use rather than a claimed energy or throughput win**. The result is promising enough to justify a larger controlled study, but its current evidence should be read with the limitations above.
 
-> **TetraNet in one line:** a two-bit register holds four states; with $c \in \{\frac14, \frac12\}$ the extra two cost nothing but a shift — and they beat the ternary baseline that leaves them idle.
+> **TetraNet in one line:** a two-bit register holds four states; with $c \in \{\frac14, \frac12\}$ the extra two cost nothing but a shift, and they beat the ternary baseline that leaves them idle.
 
 ### Reproducibility note
 

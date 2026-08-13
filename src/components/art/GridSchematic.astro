@@ -8,7 +8,7 @@ const line = '#e3ded2';
 
 // number line: -1 .. 1, c = 1/2, b = (1+c)/2 = 0.75
 const cx = 600;
-const unit = 480;
+const unit = 440;
 const xv = (v: number) => cx + v * unit;
 
 const regions = [
@@ -25,91 +25,93 @@ const codes = [
   { code: '11', value: '−c', solid: false, color: accent },
 ];
 
-const yLine = 220;
-const chipY = 360;
+const yLine = 190;
+const chipY = 370;
 ---
 
 <svg
-  viewBox="0 0 1200 520"
+  viewBox="0 0 1200 540"
   role="img"
   aria-label="Quaternary quantizer: number line with two thresholds, and two-bit codeword mapping"
   xmlns="http://www.w3.org/2000/svg"
+  style="width:100%; height:auto; display:block;"
 >
-  <rect width="1200" height="520" fill={paper} />
+  <rect width="1200" height="540" fill={paper} />
 
-  <text x="80" y="88" font-family="IBM Plex Mono, monospace" font-size="14" letter-spacing="3" fill={ink}>
-    THE QUANTIZER
+  <!-- Top Title & Subtitle -->
+  <text x="60" y="52" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="700" letter-spacing="3" fill={ink}>
+    THE QUANTIZER SCHEMATIC
   </text>
-  <text x="80" y="112" font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="2" fill={gray}>
+  <text x="60" y="84" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" letter-spacing="1.5" fill={gray}>
     TWO THRESHOLDS AT ±(1+c)/2 · c = ½ SHOWN
   </text>
 
-  <!-- region strips -->
+  <!-- Region strips -->
   {regions.map((r) => (
     <g>
-      <rect x={xv(r.from)} y={yLine - 26} width={xv(r.to) - xv(r.from)} height="52" rx="6" fill={r.color} opacity="0.10" />
-      <text x={(xv(r.from) + xv(r.to)) / 2} y={yLine + 6} font-family="IBM Plex Mono, monospace" font-size="19" fill={r.color} text-anchor="middle">
+      <rect x={xv(r.from)} y={yLine - 28} width={xv(r.to) - xv(r.from)} height="56" rx="8" fill={r.color} opacity="0.10" />
+      <text x={(xv(r.from) + xv(r.to)) / 2} y={yLine + 8} font-family="IBM Plex Mono, monospace" font-size="22" font-weight="700" fill={r.color} text-anchor="middle">
         {r.label}
       </text>
     </g>
   ))}
 
-  <!-- number line -->
-  <line x1={xv(-1)} y1={yLine} x2={xv(1)} y2={yLine} stroke={ink} stroke-width="2.5" />
+  <!-- Number line -->
+  <line x1={xv(-1)} y1={yLine} x2={xv(1)} y2={yLine} stroke={ink} stroke-width="3.5" />
   {[-1, -0.75, 0, 0.75, 1].map((t) => (
     <g>
-      <line x1={xv(t)} y1={yLine - 9} x2={xv(t)} y2={yLine + 9} stroke={ink} stroke-width="2.5" />
+      <line x1={xv(t)} y1={yLine - 12} x2={xv(t)} y2={yLine + 12} stroke={ink} stroke-width="3.5" />
       {t !== -0.75 && t !== 0.75 && (
-        <text x={xv(t)} y={yLine + 30} font-family="IBM Plex Mono, monospace" font-size="16" fill={ink} text-anchor="middle">
+        <text x={xv(t)} y={yLine + 38} font-family="IBM Plex Mono, monospace" font-size="18" font-weight="700" fill={ink} text-anchor="middle">
           {t}
         </text>
       )}
       {(t === -0.75 || t === 0.75) && (
-        <text x={xv(t)} y={yLine + 30} font-family="IBM Plex Mono, monospace" font-size="15" fill={gray} text-anchor="middle">
+        <text x={xv(t)} y={yLine + 38} font-family="IBM Plex Mono, monospace" font-size="18" font-weight="700" fill={gray} text-anchor="middle">
           {t < 0 ? '−b' : '+b'}
         </text>
       )}
     </g>
   ))}
 
-  <!-- codewords -->
-  {codes.map((c, i) => {
-    const x = 200 + i * 210;
-    return (
-      <g>
-        <rect x={x - 20} y={chipY - 20} width="40" height="40" rx="6" fill="none" stroke={c.color} stroke-width="2.5" />
-        {c.solid && <rect x={x - 14} y={chipY - 14} width="28" height="28" rx="4" fill={c.color} />}
-        <text x={x} y={chipY + 46} font-family="IBM Plex Mono, monospace" font-size="15" fill={ink} text-anchor="middle">
-          {c.code}
-        </text>
-        <text x={x} y={chipY - 36} font-family="IBM Plex Mono, monospace" font-size="17" fill={c.color} text-anchor="middle">
-          {c.value}
-        </text>
-      </g>
-    );
-  })}
-
-  <line x1="110" y1={chipY} x2="300" y2={chipY} stroke={gray} stroke-width="1" stroke-dasharray="3 5" />
-
-  <!-- shift note -->
+  <!-- Codeword Chips (Arranged on left) -->
   <g>
-    <rect x="500" y="300" width="320" height="120" rx="10" fill="none" stroke={line} stroke-width="1.5" />
-    <text x="520" y="335" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1" fill={ink}>
-      SHIFT COST PER STATE
+    <text x="60" y={chipY - 60} font-family="IBM Plex Mono, monospace" font-size="15" font-weight="700" letter-spacing="2" fill={gray}>
+      CODEWORD MAPPINGS
     </text>
-    <text x="520" y="362" font-family="IBM Plex Mono, monospace" font-size="14" fill={ink}>
-      c = ½ · code 10 → 1 arithmetic shift
-    </text>
-    <text x="520" y="386" font-family="IBM Plex Mono, monospace" font-size="14" fill={ink}>
-      c = ¼ · code 10 → 2 arithmetic shifts
-    </text>
-    <text x="520" y="410" font-family="IBM Plex Mono, monospace" font-size="12" fill={teal}>
-      no multiplier touched
-    </text>
+
+    {codes.map((c, i) => {
+      const x = 110 + i * 145;
+      return (
+        <g>
+          <rect x={x - 24} y={chipY - 24} width="48" height="48" rx="8" fill="none" stroke={c.color} stroke-width="3" />
+          {c.solid && <rect x={x - 16} y={chipY - 16} width="32" height="32" rx="5" fill={c.color} />}
+          <text x={x} y={chipY - 38} font-family="IBM Plex Mono, monospace" font-size="20" font-weight="700" fill={c.color} text-anchor="middle">
+            {c.value}
+          </text>
+          <text x={x} y={chipY + 52} font-family="IBM Plex Mono, monospace" font-size="18" font-weight="700" fill={ink} text-anchor="middle">
+            {c.code}
+          </text>
+        </g>
+      );
+    })}
   </g>
 
-  <line x1="860" y1="340" x2="960" y2="340" stroke={teal} stroke-width="1" stroke-dasharray="2 4" />
-  <text x="980" y="345" font-family="IBM Plex Mono, monospace" font-size="12" fill={teal}>
-    10 → 01
-  </text>
+  <!-- Shift Note Card (Placed cleanly on right) -->
+  <g>
+    <rect x="670" y={chipY - 70} width="470" height="145" rx="10" fill="none" stroke={line} stroke-width="2" />
+    <rect x="670" y={chipY - 70} width="470" height="145" rx="10" fill={paper} opacity="0.9" />
+    <text x="695" y={chipY - 38} font-family="IBM Plex Mono, monospace" font-size="16" font-weight="700" letter-spacing="1.5" fill={ink}>
+      SHIFT COST PER STATE
+    </text>
+    <text x="695" y={chipY - 6} font-family="IBM Plex Mono, monospace" font-size="16" fill={ink}>
+      c = ½ · codeword 10 → 1 arithmetic shift
+    </text>
+    <text x="695" y={chipY + 24} font-family="IBM Plex Mono, monospace" font-size="16" fill={ink}>
+      c = ¼ · codeword 10 → 2 arithmetic shifts
+    </text>
+    <text x="695" y={chipY + 54} font-family="IBM Plex Mono, monospace" font-size="15" font-weight="700" fill={teal}>
+      ✓ Zero floating-point multipliers touched
+    </text>
+  </g>
 </svg>

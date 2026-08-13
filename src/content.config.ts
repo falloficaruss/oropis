@@ -10,7 +10,7 @@ const posts = defineCollection({
     type: z.enum(['research', 'blog']),
     tags: z.array(z.string()).default([]),
     author: z.string().default('Abhishek Shinde'),
-    art: z.enum(['tetranet', 'ternary']),
+    art: z.enum(['tetranet', 'ternary', 'nnue', 'multiagent']),
   }),
 });
 

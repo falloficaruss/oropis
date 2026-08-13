@@ -1,57 +1,81 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
-import { getAllPosts, fmtDate } from '../lib/posts';
+import PostRow from '../components/PostRow.astro';
+import { getAllPosts } from '../lib/posts';
 
 const posts = await getAllPosts();
-const researchCount = posts.filter((p) => p.data.type === 'research').length;
-const blogCount = posts.length - researchCount;
+const featuredPost = posts[0]; // TetraNet
+const secondaryPosts = posts.slice(1);
 ---
 
-<BaseLayout title="Blog" active="/">
+<BaseLayout title="Home" active="">
+  <!-- Hero Section -->
   <div class="container">
     <section class="hero">
-      <p class="meta">
-        Oropis<span class="sep">·</span>Research &amp; writing on small models
-      </p>
-      <h1>Small weights,<br />sharp ideas.</h1>
+      <div class="hero-pill-badge">
+        <span>●</span> Independent Research Lab
+      </div>
+      <h1>
+        Our research investigates the arithmetic, kernels, and hardware systems of low-bit AI models.
+      </h1>
       <p class="lede">
-        Notes and releases on efficient inference, low-bit LLMs, and the
-        hardware they land on — published as they happen.
+        Notes and technical releases on efficient inference, power-of-two quaternary weight grids, and high-throughput edge kernels — published as they happen.
       </p>
+      <div class="hero-cta-group">
+        <a href="/research" class="btn-primary">
+          Explore Research <span class="arrow">→</span>
+        </a>
+        <a href="/about" class="btn-secondary">
+          About the Lab
+        </a>
+      </div>
     </section>
   </div>
 
+  <!-- Featured Publication Showcase -->
   <div class="container">
-    <div class="filter-bar" data-filter-bar>
-      <button class="active" data-filter="all">All<span class="meta" style="margin-left:8px;">{posts.length}</span></button>
-      <button data-filter="research">Research<span class="meta" style="margin-left:8px;">{researchCount}</span></button>
-      <button data-filter="blog">Blog<span class="meta" style="margin-left:8px;">{blogCount}</span></button>
+    <div class="section-header">
+      <h2>Featured Research Paper</h2>
+      <span class="meta">Latest Release</span>
     </div>
 
-    <div class="post-grid" data-post-grid>
-      {posts.map((post) => (
-        <div data-post data-type={post.data.type}>
-          <PostCard post={post} />
-        </div>
-      ))}
-    </div>
+    {featuredPost && (
+      <PostCard post={featuredPost} featured={true} />
+    )}
   </div>
+
+  <!-- Recent Research & Essays Feed -->
+  {secondaryPosts.length > 0 && (
+    <div class="container">
+      <div class="section-header" style="margin-top: 56px;">
+        <h2>Technical Releases &amp; Essays</h2>
+        <a href="/blog" class="btn-secondary" style="font-size:0.82rem; padding: 6px 16px;">View All</a>
+      </div>
+
+      <div class="post-list">
+        {secondaryPosts.map((post) => (
+          <PostRow post={post} />
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Dark Contrast Band -->
+  <section class="dark-band" style="margin-top: 64px;">
+    <div class="container">
+      <h2>Open research code, specialized kernels, and reproducible benchmarks.</h2>
+      <p>
+        Every technical release from Oropis is paired with open-source PyTorch models, custom Triton kernels, and frozen validation data to allow direct reproduction and verification.
+      </p>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener" class="btn-light">
+          Explore Code on GitHub ↗
+        </a>
+        <a href="/about" class="btn-outline-light">
+          About Abhishek Shinde
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
-
-<script>
-  const bar = document.querySelector('[data-filter-bar]');
-  const items = document.querySelectorAll('[data-post]');
-
-  bar?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('button');
-    if (!btn) return;
-    const filter = btn.dataset.filter;
-    bar.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
-    items.forEach((item) => {
-      const el = item as HTMLElement;
-      const show = filter === 'all' || el.dataset.type === filter;
-      el.style.display = show ? '' : 'none';
-    });
-  });
-</script>

@@ -12,10 +12,10 @@ const teal = '#2c6e66';
 const line = '#cfc8b8';
 const faint = '#8a8377';
 
-const cx = 372;
-const cy = 300;
-const R = 172;
-const r = 118;
+const cx = 360;
+const cy = 320;
+const R = 150;
+const r = 100;
 
 const angles = [-90, 30, 150];
 
@@ -30,11 +30,12 @@ function pt(cx: number, cy: number, rad: number, deg: number): [number, number] 
   role="img"
   aria-label="Three-state ternary digit showing 1.58 bits per weight"
   xmlns="http://www.w3.org/2000/svg"
+  style="width:100%; height:auto; display:block;"
 >
   <rect width="1200" height="675" fill={paper} />
 
-  <!-- dot lattice -->
-  <g fill={line} opacity="0.5">
+  <!-- Subtle dot lattice -->
+  <g fill={line} opacity="0.4">
     {Array.from({ length: 17 }).map((_, i) =>
       Array.from({ length: 10 }).map((_, j) => (
         <circle cx={38 + i * 70} cy={38 + j * 66} r="1.3" />
@@ -42,16 +43,17 @@ function pt(cx: number, cy: number, rad: number, deg: number): [number, number] 
     )}
   </g>
 
-  <text x="80" y="96" font-family="IBM Plex Mono, monospace" font-size="15" letter-spacing="4" fill={ink}>
+  <!-- Title & Subtitle -->
+  <text x="60" y="52" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="700" letter-spacing="3" fill={ink}>
     ONE TRIT · THREE STATES
   </text>
   {!card && (
-    <text x="80" y="122" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="2" fill={faint}>
-      LOG₂ 3 ≈ 1.585 BITS
+    <text x="60" y="84" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" letter-spacing="1.5" fill={faint}>
+      LOG₂ 3 ≈ 1.585 BITS PER WEIGHT
     </text>
   )}
 
-  <!-- trit dial -->
+  <!-- Trit Dial -->
   <g>
     {angles.map((a) => (
       <path
@@ -72,50 +74,50 @@ function pt(cx: number, cy: number, rad: number, deg: number): [number, number] 
       const label = a === -90 ? '+1' : a === 30 ? '0' : '−1';
       return (
         <g>
-          <circle cx={x} cy={y} r="9" fill={a === 150 ? accent : a === 30 ? teal : ink} />
-          <text x={x} y={y + (a === 30 ? 34 : -22)} font-family="IBM Plex Mono, monospace" font-size="17" fill={ink} text-anchor="middle">
+          <circle cx={x} cy={y} r="11" fill={a === 150 ? accent : a === 30 ? teal : ink} />
+          <text x={x} y={y + (a === 30 ? 36 : -20)} font-family="IBM Plex Mono, monospace" font-size="22" font-weight="700" fill={ink} text-anchor="middle">
             {label}
           </text>
         </g>
       );
     })}
-    <text x={cx} y={cy - 8} font-family="Newsreader Variable, Georgia, serif" font-size="30" fill={ink} text-anchor="middle" font-style="italic">
+    <text x={cx} y={cy - 6} font-family="Newsreader Variable, Georgia, serif" font-size="36" fill={ink} text-anchor="middle" font-style="italic">
       d
     </text>
-    <text x={cx} y={cy + 24} font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="1" fill={faint} text-anchor="middle">
+    <text x={cx} y={cy + 26} font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" letter-spacing="1" fill={faint} text-anchor="middle">
       ln(3)/ln(2)
     </text>
   </g>
 
-  <!-- 1.58 numeral -->
+  <!-- 1.58 Numeral & Labels -->
   <g>
-    <text x="640" y="330" font-family="Newsreader Variable, Georgia, serif" font-size="210" font-weight="550" fill={ink}>
+    <text x="630" y="320" font-family="Newsreader Variable, Georgia, serif" font-size="220" font-weight="550" fill={ink}>
       1.58
     </text>
-    <text x="652" y="392" font-family="IBM Plex Mono, monospace" font-size="16" letter-spacing="3" fill={faint}>
+    <text x="640" y="380" font-family="IBM Plex Mono, monospace" font-size="18" font-weight="700" letter-spacing="3" fill={faint}>
       BITS PER WEIGHT
     </text>
     {!card && (
-      <text x="652" y="424" font-family="IBM Plex Mono, monospace" font-size="14" letter-spacing="1" fill={faint}>
-      THREE SYMBOLS · {`{−1, 0, +1}`} · ONE SYMBOL ≈ 0.53 BITS
+      <text x="640" y="416" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="500" letter-spacing="1" fill={faint}>
+        THREE SYMBOLS · {`{−1, 0, +1}`} · ONE SYMBOL ≈ 0.53 BITS
       </text>
     )}
   </g>
 
-  <!-- storage bar -->
+  <!-- Storage bar comparison -->
   <g>
-    <line x1="640" y1="520" x2="1120" y2="520" stroke={line} stroke-width="1.5" />
-    <rect x="640" y="486" width="470" height="16" rx="4" fill="none" stroke={ink} stroke-width="2" />
-    <rect x="640" y="486" width="470" height="16" rx="4" fill={ink} opacity="0.07" />
+    <line x1="640" y1="490" x2="1120" y2="490" stroke={line} stroke-width="2" />
+    <rect x="640" y="510" width="460" height="20" rx="5" fill="none" stroke={ink} stroke-width="2.5" />
+    <rect x="640" y="510" width="460" height="20" rx="5" fill={ink} opacity="0.08" />
     {!card && (
-      <text x="640" y="570" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1" fill={faint}>
+      <text x="640" y="552" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" letter-spacing="1" fill={faint}>
         FP16 WEIGHTS: 16 BITS
       </text>
     )}
-    <rect x="640" y="600" width="470" height="16" rx="4" fill="none" stroke={accent} stroke-width="2" />
-    <rect x="640" y="600" width={Math.round((1.585 / 16) * 470)} height="16" rx="4" fill={accent} />
+    <rect x="640" y="586" width="460" height="20" rx="5" fill="none" stroke={accent} stroke-width="2.5" />
+    <rect x="640" y="586" width={Math.round((1.585 / 16) * 460)} height="20" rx="5" fill={accent} />
     {!card && (
-      <text x="640" y="648" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1" fill={faint}>
+      <text x="640" y="628" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" letter-spacing="1" fill={faint}>
         TERNARY: 1.58 BITS — ~10× FEWER WEIGHT BYTES
       </text>
     )}
