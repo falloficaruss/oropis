@@ -737,40 +737,11 @@ input {
   line-height: 1.42;
 }
 
-.byline {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.article-date {
   margin-top: 26px;
+  margin-bottom: 0;
   padding-top: 18px;
   border-top: 1px solid var(--line);
-}
-
-.byline-avatar {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  background: var(--panel-2);
-  border: 1px solid var(--line-strong);
-  color: var(--accent);
-  font-family: var(--serif);
-  font-size: 19px;
-  font-weight: 700;
-}
-
-.byline div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.byline strong {
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-
-.byline span {
   color: var(--muted-2);
   font-family: var(--mono);
   font-size: 10px;

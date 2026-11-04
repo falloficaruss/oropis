@@ -75,18 +75,12 @@ const jsonLd = {
       <h1>{title}</h1>
       <p class="article-dek">{description}</p>
 
-      <div class="byline">
-        <span class="byline-avatar" aria-hidden="true">O</span>
-        <div>
-          <strong>{author}</strong>
-          <span>
-            <time datetime={pubDate.toISOString()}>{fmtDateLong(pubDate)}</time>
-            {updatedDate && updatedDate.getTime() !== pubDate.getTime() && (
-              <> · Updated <time datetime={updatedDate.toISOString()}>{fmtDateLong(updatedDate)}</time></>
-            )}
-          </span>
-        </div>
-      </div>
+      <p class="article-date">
+        <time datetime={pubDate.toISOString()}>{fmtDateLong(pubDate)}</time>
+        {updatedDate && updatedDate.getTime() !== pubDate.getTime() && (
+          <> · Updated <time datetime={updatedDate.toISOString()}>{fmtDateLong(updatedDate)}</time></>
+        )}
+      </p>
     </header>
 
     {hero && (
