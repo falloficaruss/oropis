@@ -5,6 +5,9 @@ description: Chennai's ₹75 lakh event has 32 BGMI teams chasing 16 Grand Final
 pubDate: '2026-11-04T02:43:28+00:00'
 author: OropisHQ
 game: PUBG Mobile
+hero: /images/cegc-2026-bgmi-rosters.jpg
+heroAlt: "Revenant XSpark's BGMI roster in team jerseys"
+heroCredit: "Revenant Esports"
 archetype: roster
 format: news
 tags:

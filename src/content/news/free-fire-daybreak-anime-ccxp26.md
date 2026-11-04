@@ -5,6 +5,9 @@ description: Garena's anime adaptation will screen its first episode in São Pau
 pubDate: '2026-11-04T02:33:28+00:00'
 author: OropisHQ
 game: Free Fire
+hero: /images/free-fire-daybreak-anime-ccxp26.jpg
+heroAlt: "Free Fire: Daybreak key visual with Kelly, Hayato, and Moco over New Dawn"
+heroCredit: "Garena"
 archetype: business
 format: news
 tags:

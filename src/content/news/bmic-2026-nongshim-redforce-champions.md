@@ -7,7 +7,7 @@ author: OropisHQ
 game: PUBG Mobile
 hero: /images/bmic-2026.jpg
 heroAlt: "Nongshim RedForce players celebrating on an esports stage"
-heroCredit: "Photo credit: Your source or photographer"
+heroCredit: "KRAFTON India Esports"
 archetype: match
 format: news
 tags:

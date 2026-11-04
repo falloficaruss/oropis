@@ -5,6 +5,9 @@ description: NS RedForce's BMIC 2026 winner was back at his desk in the team hou
 pubDate: '2026-11-04T02:28:28+00:00'
 author: OropisHQ
 game: PUBG Mobile
+hero: /images/hyunbin-ns-redforce-bmic-2026.jpg
+heroAlt: "HYUNBIN at the PUBG Mobile World Cup 2025"
+heroCredit: "Liquipedia / PUBG Mobile World Cup 2025"
 archetype: roster
 format: news
 tags:

@@ -5,6 +5,9 @@ description: The 30-day Survivor League runs until November 17, with 50 creators
 pubDate: '2026-11-04T02:38:28+00:00'
 author: OropisHQ
 game: PUBG Mobile
+hero: /images/bgmi-survivor-league-50-creators.jpg
+heroAlt: "Promotional artwork for the BGMI Survivor League creator competition"
+heroCredit: "IGN India"
 archetype: business
 format: news
 tags:

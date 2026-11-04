@@ -5,8 +5,9 @@ description: The 7th Anniversary season brings Warzone's most recognisable map t
 pubDate: '2026-11-04T02:53:28+00:00'
 author: OropisHQ
 game: 'Call of Duty: Mobile'
-hero: /images/verdansk.jpg
-heroAlt: 'Verdansk Map'
+hero: /images/codm-season-10-verdansk-7th-anniversary.jpg
+heroAlt: "Call of Duty: Mobile Season 10 promotional artwork featuring Verdansk"
+heroCredit: "Call of Duty: Mobile / BestLoadout"
 archetype: patch
 format: news
 tags:

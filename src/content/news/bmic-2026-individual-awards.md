@@ -5,6 +5,9 @@ description: K9's Taurus was the only Indian individual winner as Nongshim RedFo
 pubDate: '2026-11-04T02:23:28+00:00'
 author: OropisHQ
 game: PUBG Mobile
+hero: /images/bmic-2026.jpg
+heroAlt: "Players compete on the BMIC 2026 stage in Mumbai"
+heroCredit: "KRAFTON India Esports"
 archetype: news
 format: news
 tags:

@@ -5,6 +5,9 @@ description: Free Fire's biggest event opens November 6 with 24 teams, a $350,00
 pubDate: '2026-11-04T02:48:28+00:00'
 author: OropisHQ
 game: Free Fire
+hero: /images/ffws-global-finals-2026-preview.webp
+heroAlt: "FFWS Global Finals 2026 Knockout Stage Phase 1 team-group graphic"
+heroCredit: "Garena / itemgame"
 archetype: tournament
 format: news
 tags:
