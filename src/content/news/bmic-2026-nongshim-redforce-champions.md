@@ -5,7 +5,7 @@ description: The Korean side won five chicken dinners and finished 82 points cle
 pubDate: '2026-11-04T02:58:28+00:00'
 author: OropisHQ
 game: PUBG Mobile
-hero: /images/BMIC-2026.jpeg
+hero: /images/bmic-2026.jpg
 heroAlt: "Nongshim RedForce players celebrating on an esports stage"
 heroCredit: "Photo credit: Your source or photographer"
 archetype: match
