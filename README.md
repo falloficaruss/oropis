@@ -63,6 +63,20 @@ DNS is already configured:
 - `public/CNAME` sets the custom domain
 - Pages source: **GitHub Actions**, HTTPS enforced
 
+## Images
+
+Images are uploaded through the story editor in the admin.
+
+- **Hero:** upload a JPEG/PNG/WebP, add alt text and credit, then save or publish.
+- **Inline:** upload with required alt text and optional caption/credit; the editor
+  inserts a responsive `<figure>` at the cursor.
+- The server converts uploads to WebP, strips metadata, and resizes to 2000 px
+  (hero) or 1600 px (inline).
+- Source files live outside this repo in `gaming/site-media/uploads/`. The exporter
+  copies them into `public/media/` and tracks them in `src/content/news/.export.json`.
+- Do not hotlink images or add files directly to `public/media/`; the deploy timer
+  resets the repo before exporting.
+
 ## Notes
 
 - Every story needs a headline, body, at least one source, and an editor review.

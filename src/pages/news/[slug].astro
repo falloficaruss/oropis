@@ -21,7 +21,7 @@ export async function getStaticPaths() {
 }
 
 const { story, stories } = Astro.props;
-const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, sources, facts, xPostUrl } = story.data;
+const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, heroAlt, sources, facts, xPostUrl } = story.data;
 const { Content } = await render(story);
 const related = relatedStories(story, stories);
 const canonical = new URL(storyUrl(story), Astro.site).toString();
@@ -95,7 +95,7 @@ const jsonLd = {
 
     {hero && (
       <figure class="article-hero wrap">
-        <img src={hero} alt="" loading="eager" />
+        <img src={hero} alt={heroAlt ?? ''} loading="eager" />
         {heroCredit && <figcaption>Image: {heroCredit}</figcaption>}
       </figure>
     )}

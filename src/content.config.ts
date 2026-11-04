@@ -21,6 +21,7 @@ const news = defineCollection({
     tags: z.array(z.string()).default([]),
     hero: z.string().optional(),
     heroCredit: z.string().optional(),
+    heroAlt: z.string().optional(),
     sources: z.array(source).default([]),
     facts: z.record(z.string(), z.any()).default({}),
     xPostUrl: z.string().url().optional(),

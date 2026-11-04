@@ -857,6 +857,37 @@ input {
   margin: 0 0 1.25em;
 }
 
+.prose img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.prose .article-figure {
+  margin: 1.8em 0;
+}
+
+.prose .article-figure img {
+  width: 100%;
+  background: var(--panel-2);
+}
+
+.prose .article-figure figcaption {
+  margin-top: 8px;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+}
+
+.prose .article-figure .image-credit {
+  color: var(--muted-2);
+  white-space: nowrap;
+}
+
 .prose h2 {
   margin: 1.7em 0 0.55em;
   color: var(--ink);
