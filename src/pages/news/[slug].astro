@@ -1,7 +1,6 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import FactBox from '../../components/FactBox.astro';
 import SourceList from '../../components/SourceList.astro';
 import StoryCard from '../../components/StoryCard.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
@@ -11,7 +10,6 @@ import {
   fmtDateLong,
   formatArchetype,
   gameSlug,
-  tagSlug,
   storyUrl,
 } from '../../lib/news';
 
@@ -21,12 +19,10 @@ export async function getStaticPaths() {
 }
 
 const { story, stories } = Astro.props;
-const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, heroAlt, sources, facts, xPostUrl } = story.data;
+const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, heroAlt, sources } = story.data;
 const { Content } = await render(story);
 const related = relatedStories(story, stories);
 const canonical = new URL(storyUrl(story), Astro.site).toString();
-const shareText = encodeURIComponent(`${title} — via @OropisHQ`);
-const shareUrl = encodeURIComponent(canonical);
 const label = formatArchetype(archetype);
 
 const jsonLd = {
@@ -100,32 +96,10 @@ const jsonLd = {
       </figure>
     )}
 
-    <div class="article-layout wrap">
+    <div class="article-layout wrap narrow">
       <div class="article-body prose">
         <Content />
       </div>
-
-      <aside class="article-aside">
-        <FactBox facts={facts} archetype={archetype} />
-
-        <div class="share-box">
-          <p class="eyebrow">Share</p>
-          <a class="share-x" href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`} target="_blank" rel="noopener">
-            Post on X
-          </a>
-          {xPostUrl && <a class="share-discuss" href={xPostUrl} target="_blank" rel="noopener">Discuss the source post</a>}
-          <a class="share-rss" href="/rss.xml">Subscribe via RSS</a>
-        </div>
-
-        {tags.length > 0 && (
-          <div class="tag-box">
-            <p class="eyebrow">Tags</p>
-            <ul class="tag-row">
-              {tags.map((tag) => <li><a href={`/tags/${tagSlug(tag)}/`}>#{tag}</a></li>)}
-            </ul>
-          </div>
-        )}
-      </aside>
     </div>
 
     <div class="wrap narrow">
