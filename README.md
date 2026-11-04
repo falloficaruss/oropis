@@ -1,8 +1,11 @@
 # Oropis
 
-The source for [oropis.com](https://oropis.com) — research releases and writing on small models, low-bit LLMs, and efficient inference.
+The source for [oropis.com](https://oropis.com) — an independent mobile esports desk covering
+**PUBG Mobile / BGMI**, **Free Fire**, and **Call of Duty: Mobile**.
 
-Built with **Astro** (MDX + KaTeX) and deployed to **GitHub Pages**.
+Published stories live in `src/content/news/` as Markdown. The `agg` pipeline owns that
+directory: drafts are edited in the local admin app, published into `site.db`, and exported
+here by the deploy timer.
 
 ## Local development
 
@@ -17,53 +20,52 @@ npm run preview    # serve the built site
 
 ```
 src/
-  content/posts/      # MDX posts (research + blog)
-  content.config.ts   # content collection schema (title, date, type, art, …)
-  components/
-    art/              # hand-drawn SVG art + data-driven chart figures per post
-    *.astro           # PostCard, Figure, Tldr, Outline, Cite, Refs, Sec, …
-  layouts/            # BaseLayout (header/nav/footer, fonts)
-  pages/              # / (blog landing), /research, /blog, /about, /posts/[slug], /rss.xml, 404
-  styles/global.css   # design tokens & component styles
+  content/news/          # published stories (generated from site.db)
+  content.config.ts      # news collection schema
+  components/            # StoryCard, NewsList, FactBox, SourceList, Pagination, …
+  layouts/BaseLayout.astro
+  lib/news.ts            # story helpers: URLs, sections, dates, related stories
+  pages/
+    index.astro          # homepage
+    news/                # story index, pagination, story pages
+    games/               # per-game hubs
+    [section].astro      # results, transfers, patches, business
+    tags/                # tag index and tag pages
+    search.astro         # client-side search
+    rss.xml.ts
+  styles/global.css
 ```
 
-## Adding a post
+## Editorial flow
 
-Drop an MDX file in `src/content/posts/`. Frontmatter:
+Do not write story Markdown by hand for normal publishing. Use the `agg` admin at
+`http://127.0.0.1:8091/admin` (SSH tunnel from a laptop), or the CLI:
 
-```yaml
-title: "..."
-description: "one-line excerpt used on cards"
-date: 2026-08-01
-type: research        # or blog
-tags: [quantization, ...]
-author: Abhishek Shinde
-art: tetranet         # or ternary — selects the SVG hero art
+```bash
+agg -a gaming site sync --since 72
+agg -a gaming site publish ID
+agg -a gaming site deploy --dry-run
 ```
 
-Give every post an SVG hero (`art`) — each post is designed to carry one.
+`site deploy` exports published stories into `src/content/news/`, builds the site, commits,
+and pushes to `master`. It runs `git fetch` and `git reset --hard origin/master` first, so any
+local site-code changes must be committed and pushed before the timer runs.
 
 ## Deployment
 
-GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes `dist/` to
-GitHub Pages on every push to `master`.
+GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes `dist/` to GitHub Pages
+on every push to `master`.
 
-### One-time DNS setup
+DNS is already configured:
 
-1. In **GitHub → repo → Settings → Pages**:
-   - Source: *GitHub Actions*
-   - Custom domain: `oropis.com` (leave the enforce-HTTPS checkbox on)
-2. At your DNS provider, point `oropis.com` to the Pages host with one of:
-   - **A records** → the four IPs shown in GitHub Pages settings, or
-   - **CNAME / ALIAS** → `falloficaruss.github.io` (subdomain-style records for the domain root)
-3. The `public/CNAME` file (already committed) makes Pages use the custom domain.
-
-SSL certificate issuance by GitHub can take a few minutes to a day after DNS propagates.
+- `oropis.com` → GitHub Pages A records
+- `www.oropis.com` → `falloficaruss.github.io`
+- `public/CNAME` sets the custom domain
+- Pages source: **GitHub Actions**, HTTPS enforced
 
 ## Notes
 
-- Research posts read as technical releases under the author's name; the About
-  page doubles as the personal portfolio (bio, timeline, projects, writing).
-- Figures in the TetraNet post are rebuilt as inline SVG charts from the
-  paper's tables (the original `Quaternary_paper.pdf` is not stored in this
-  repo; its text is preserved in the post).
+- Every story needs a headline, body, at least one source, and an editor review.
+- Byline is `OropisHQ`; credit other outlets and link primary sources.
+- Hero images are cached locally with visible credit. No hotlinking.
+- Do not publish source text wholesale; rewrite from the drafting packet.
