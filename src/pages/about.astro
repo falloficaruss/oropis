@@ -1,96 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getAllPosts, postUrl, fmtDate } from '../lib/posts';
 
-const posts = await getAllPosts();
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About Oropis',
+  url: 'https://oropis.com/about/',
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'Oropis',
+    url: 'https://oropis.com/',
+    sameAs: ['https://x.com/OropisHQ'],
+  },
+};
 ---
 
-<BaseLayout title="About" active="/about" description="About Abhishek Shinde and Oropis — AI developer and researcher">
-  <div class="container">
-    <header class="about-hero">
-      <div class="hero-pill-badge">
-        <span>●</span> About the Lab &amp; Author
-      </div>
-      <h1>Abhishek Shinde</h1>
-      <p style="font-family:var(--sans); font-size:0.85rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin: 0 0 20px;">
-        AI Developer &amp; Independent Researcher
-      </p>
-      <p style="max-width:620px; color:var(--ink-soft); font-size:1.2rem; line-height:1.6; margin:0;">
-        Oropis is where research and writing on efficient inference, low-bit LLMs, and hardware-aligned systems is published.
-      </p>
-    </header>
+<BaseLayout title="About" description="How Oropis reports, edits, and corrects PUBG Mobile, Free Fire, and Call of Duty: Mobile coverage." jsonLd={jsonLd}>
+  <section class="wrap page-head">
+    <p class="eyebrow">About the desk</p>
+    <h1>Reported, not reposted.</h1>
+    <p>Oropis is an independent outlet for mobile esports. We cover PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile — the results, roster moves, patches, tournaments, and business decisions that shape the scene — with original copy and verifiable sourcing.</p>
+  </section>
 
-    <section class="about-section" id="about">
-      <span class="section-label">Mission</span>
-      <div class="section-content">
-        <p>
-          <strong>Short version.</strong> Building and studying models that fit closer to the hardware they run on.
-        </p>
-        <p>
-          <strong>Longer version.</strong> Oropis works in public on low-bit language models, shift-oriented inference, and systems questions around them. The aim is direct: make the useful parts clear enough to be verified, benchmarked, and carried forward.
-        </p>
-        <p>
-          Email is open at <a href="mailto:norizzabhii@gmail.com">norizzabhii@gmail.com</a>.
-        </p>
-      </div>
-    </section>
+  <section class="wrap narrow prose">
+    <h2>What we do</h2>
+    <p>Our desk monitors public competitive records for three mobile beats: tournament pages, official publisher and esports announcements, organizer posts, patch notes, and public posts from teams and players. We turn those primary sources into short, readable stories for people who follow the scene closely.</p>
 
-    <section class="about-section" id="timeline">
-      <span class="section-label">Timeline</span>
-      <div class="section-content">
-        <ul class="timeline">
-          <li>
-            <span class="when">Jul 2026</span>
-            <span class="what">TetraNet — power-of-two quaternary weight paper &amp; kernels.</span>
-          </li>
-          <li>
-            <span class="when">2025–2026</span>
-            <span class="what">AI development, Triton kernels &amp; low-bit quantization experiments.</span>
-          </li>
-          <li>
-            <span class="when">2024</span>
-            <span class="what">First decoder language-model architecture experiments.</span>
-          </li>
-        </ul>
-      </div>
-    </section>
+    <h2>How the desk works</h2>
+    <p>Oropis uses software to monitor public sources and prepare a research packet for each candidate story. Every published article is reviewed by a human editor, rewritten in Oropis style, checked against the underlying sources, and approved before it goes live. We do not publish unreviewed automated copy.</p>
+    <p>Stories carry a byline of <strong>OropisHQ</strong>. When a piece relies on another outlet's reporting, we link and credit it. We do not copy source text wholesale.</p>
 
-    <section class="about-section" id="projects">
-      <span class="section-label">Key Project</span>
-      <div class="section-content">
-        <div class="project-grid">
-          <a class="project-card" href="/posts/tetranet">
-            <span class="type-tag research">Research Release</span>
-            <h3>TetraNet</h3>
-            <p>
-              Power-of-two quaternary weights for small decoder-only language models. Eliminates FP multipliers while reclaiming the unused 4th state of 2-bit storage registers.
-            </p>
-            <div class="tags" style="margin-top:10px;">
-              <span>quantization</span><span>pytorch</span><span>c++</span><span>triton</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
+    <h2>What we will not do</h2>
+    <ul>
+      <li>Publish unverified rumor as fact.</li>
+      <li>Strip credit from original reporting.</li>
+      <li>Use engagement bait to disguise a lack of reporting.</li>
+      <li>Sell coverage or hide sponsorship.</li>
+    </ul>
 
-    <section class="about-section" id="publications">
-      <span class="section-label">Publications</span>
-      <div class="section-content">
-        <div class="post-list">
-          {posts.map((post) => (
-            <a href={postUrl(post)} class="post-row">
-              <span class="row-date">{fmtDate(post.data.date)}</span>
-              <div class="row-tag">
-                <span class:list={['type-tag', post.data.type]}>
-                  {post.data.type === 'research' ? 'Research' : 'Blog'}
-                </span>
-              </div>
-              <h3>{post.data.title}</h3>
-              <span class="row-arrow">→</span>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  </div>
+    <h2>Ownership and funding</h2>
+    <p>Oropis is independently operated. The site has no advertising, sponsored content, or affiliate links at launch. If that changes, it will be disclosed clearly.</p>
+
+    <h2>Corrections</h2>
+    <p>We correct errors openly. See our <a href="/corrections/">corrections policy</a> for how to flag a mistake.</p>
+  </section>
 </BaseLayout>

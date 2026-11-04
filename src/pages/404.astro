@@ -2,11 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Not found" description="Page not found">
-  <div class="container not-found">
-    <p class="code">404</p>
-    <h1>This weight state doesn't exist</h1>
-    <p>Four states were in the register — this one isn't one of them.</p>
-    <a class="plain" href="/" style="border-bottom:1px solid var(--accent); color:var(--accent); padding-bottom:2px;">← Back to the blog</a>
-  </div>
+<BaseLayout title="Page not found" description="This page is not on the server." noindex>
+  <section class="wrap not-found">
+    <p class="eyebrow">404</p>
+    <h1>Out of bounds.</h1>
+    <p>This page is not on the server. It may have been moved, unpublished, or never existed.</p>
+    <div class="not-found-actions">
+      <a class="button" href="/">Back to the front page</a>
+      <a class="button ghost" href="/news/">Latest coverage</a>
+    </div>
+  </section>
 </BaseLayout>

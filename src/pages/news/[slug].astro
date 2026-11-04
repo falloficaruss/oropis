@@ -1,0 +1,144 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FactBox from '../../components/FactBox.astro';
+import SourceList from '../../components/SourceList.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import {
+  getAllNews,
+  relatedStories,
+  fmtDateLong,
+  formatArchetype,
+  gameSlug,
+  tagSlug,
+  storyUrl,
+} from '../../lib/news';
+
+export async function getStaticPaths() {
+  const stories = await getAllNews();
+  return stories.map((story) => ({ params: { slug: story.id }, props: { story, stories } }));
+}
+
+const { story, stories } = Astro.props;
+const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, sources, facts, xPostUrl } = story.data;
+const { Content } = await render(story);
+const related = relatedStories(story, stories);
+const canonical = new URL(storyUrl(story), Astro.site).toString();
+const shareText = encodeURIComponent(`${title} — via @OropisHQ`);
+const shareUrl = encodeURIComponent(canonical);
+const label = formatArchetype(archetype);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  url: canonical,
+  image: [new URL(hero ?? '/og-default.png', Astro.site).toString()],
+  articleSection: game,
+  keywords: tags.join(', '),
+  author: { '@type': 'Organization', name: author, url: 'https://oropis.com/about/' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Oropis',
+    url: 'https://oropis.com/',
+    logo: { '@type': 'ImageObject', url: 'https://oropis.com/favicon.svg' },
+    sameAs: ['https://x.com/OropisHQ'],
+  },
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={hero}
+  type="article"
+  published={pubDate}
+  updated={updatedDate}
+  jsonLd={jsonLd}
+>
+  <article class="article">
+    <header class="article-head wrap narrow">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Oropis</a>
+        <span aria-hidden="true">/</span>
+        <a href="/news/">Latest</a>
+        <span aria-hidden="true">/</span>
+        <span>{label}</span>
+      </nav>
+
+      <div class="article-meta">
+        <a class="pill" href={`/games/${gameSlug(game)}/`}>{game}</a>
+        <span class="pill ghost">{label}</span>
+      </div>
+
+      <h1>{title}</h1>
+      <p class="article-dek">{description}</p>
+
+      <div class="byline">
+        <span class="byline-avatar" aria-hidden="true">O</span>
+        <div>
+          <strong>{author}</strong>
+          <span>
+            <time datetime={pubDate.toISOString()}>{fmtDateLong(pubDate)}</time>
+            {updatedDate && updatedDate.getTime() !== pubDate.getTime() && (
+              <> · Updated <time datetime={updatedDate.toISOString()}>{fmtDateLong(updatedDate)}</time></>
+            )}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    {hero && (
+      <figure class="article-hero wrap">
+        <img src={hero} alt="" loading="eager" />
+        {heroCredit && <figcaption>Image: {heroCredit}</figcaption>}
+      </figure>
+    )}
+
+    <div class="article-layout wrap">
+      <div class="article-body prose">
+        <Content />
+      </div>
+
+      <aside class="article-aside">
+        <FactBox facts={facts} archetype={archetype} />
+
+        <div class="share-box">
+          <p class="eyebrow">Share</p>
+          <a class="share-x" href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`} target="_blank" rel="noopener">
+            Post on X
+          </a>
+          {xPostUrl && <a class="share-discuss" href={xPostUrl} target="_blank" rel="noopener">Discuss the source post</a>}
+          <a class="share-rss" href="/rss.xml">Subscribe via RSS</a>
+        </div>
+
+        {tags.length > 0 && (
+          <div class="tag-box">
+            <p class="eyebrow">Tags</p>
+            <ul class="tag-row">
+              {tags.map((tag) => <li><a href={`/tags/${tagSlug(tag)}/`}>#{tag}</a></li>)}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
+
+    <div class="wrap narrow">
+      <SourceList sources={sources} />
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="wrap section-block related-block">
+      <SectionHeader eyebrow="Keep reading" title="Related coverage" />
+      <div class="story-grid three">
+        {related.map((item) => <StoryCard story={item} variant="compact" />)}
+      </div>
+    </section>
+  )}
+</BaseLayout>

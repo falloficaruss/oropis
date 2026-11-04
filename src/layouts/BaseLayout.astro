@@ -1,110 +1,152 @@
 ---
-import '../styles/global.css';
-import '@fontsource-variable/newsreader';
 import '@fontsource-variable/inter';
+import '@fontsource-variable/newsreader';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
-  active?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  published?: Date;
+  updated?: Date;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description = 'Research and writing on small language models, hardware arithmetic, and efficient inference.', active } = Astro.props;
+const {
+  title,
+  description = 'Oropis covers PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile with original reporting, results, roster moves, patches, and the business of mobile esports.',
+  image = '/og-default.png',
+  type = 'website',
+  published,
+  updated,
+  noindex = false,
+  jsonLd,
+} = Astro.props;
 
-const year = new Date().getFullYear();
+const siteName = 'Oropis';
+const fullTitle = title ? `${title} — Oropis` : `${siteName} — Mobile esports, reported`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL(image, Astro.site);
+const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
-const navItems = [
-  { href: '/research', label: 'Research' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/about', label: 'About' },
+const nav = [
+  { href: '/news/', label: 'Latest' },
+  { href: '/results/', label: 'Results' },
+  { href: '/transfers/', label: 'Roster moves' },
+  { href: '/patches/', label: 'Patches' },
+  { href: '/business/', label: 'Business' },
+  { href: '/games/', label: 'Games' },
 ];
+
+const isActive = (href: string) => current === href.replace(/\/+$/, '') || current.startsWith(href.replace(/\/+$/, '') + '/');
+
+const structured = jsonLd
+  ? Array.isArray(jsonLd)
+    ? jsonLd
+    : [jsonLd]
+  : [];
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title} — Oropis Research</title>
+    <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+    <meta name="theme-color" content="#0b0d10" />
+
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {updated && <meta property="article:modified_time" content={updated.toISOString()} />}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@OropisHQ" />
+    <meta name="twitter:creator" content="@OropisHQ" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+
+    {structured.map((item) => (
+      <script type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
   </head>
   <body>
-    <header class="site-header">
-      <div class="container site-header__wrap">
-        <a class="brand-group" href="/">
-          <span class="wordmark">Oropis</span>
-          <span class="wordmark-tag">Research</span>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site-head">
+      <div class="wrap head-row">
+        <a class="brand" href="/" aria-label="Oropis Mobile Esports home">
+          <span class="brand-mark" aria-hidden="true">O</span>
+          <span class="brand-text">
+            <strong>Oropis</strong>
+            <small>Mobile Esports</small>
+          </span>
         </a>
-        <nav class="main-nav">
-          {navItems.map((item) => (
-            <a href={item.href} class:list={[{ active: active === item.href }]}>
-              {item.label}
-            </a>
+
+        <nav class="nav" aria-label="Sections">
+          {nav.map((item) => (
+            <a href={item.href} class:list={['nav-link', { active: isActive(item.href) }]}>{item.label}</a>
           ))}
-          <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener" class="nav-cta">
-            View Code <span style="font-size:1.05em">↗</span>
-          </a>
         </nav>
+
+        <div class="head-actions">
+          <a class="search-link" href="/search/" aria-label="Search">Search</a>
+          <a class="x-link" href="https://x.com/OropisHQ" rel="me noopener" target="_blank" aria-label="OropisHQ on X">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23 22h-6.3l-4.9-6.5L6.2 22H3l7.3-8.4L2 2h6.4l4.4 5.9L18.9 2Zm-1.1 18h1.7L7.9 3.8H6.1L17.8 20Z"/></svg>
+            <span>@OropisHQ</span>
+          </a>
+        </div>
       </div>
     </header>
 
-    <main>
+    <main id="main">
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="container">
-        <div class="site-footer__grid">
-          <div class="footer-brand">
-            <span class="wordmark">Oropis</span>
-            <p>
-              An independent research lab investigating efficient inference, low-bit arithmetic, and hardware-aligned language models.
-            </p>
-          </div>
-
-          <div class="footer-col">
-            <h4>Research</h4>
-            <ul>
-              <li><a href="/posts/tetranet">TetraNet Paper</a></li>
-              <li><a href="/posts/era-of-1-bit-llms">1-bit LLMs &amp; Kernels</a></li>
-              <li><a href="/research">All Publications</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-col">
-            <h4>Topics</h4>
-            <ul>
-              <li><a href="/research">Quantization Grids</a></li>
-              <li><a href="/research">Shift-Oriented Kernels</a></li>
-              <li><a href="/research">Energy Sensitivity Modeling</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-col">
-            <h4>Connect</h4>
-            <ul>
-              <li><a href="https://github.com/falloficaruss" target="_blank" rel="noopener">GitHub</a></li>
-              <li><a href="https://x.com/falloficarus22" target="_blank" rel="noopener">X / Twitter</a></li>
-              <li><a href="/rss.xml">RSS Feed</a></li>
-              <li><a href="mailto:norizzabhii@gmail.com">Contact Email</a></li>
-            </ul>
-          </div>
+    <footer class="site-foot">
+      <div class="wrap foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/">
+            <span class="brand-mark" aria-hidden="true">O</span>
+            <span class="brand-text"><strong>Oropis</strong><small>Mobile Esports</small></span>
+          </a>
+          <p>Independent mobile-esports coverage for PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile. Reported, edited, and published by OropisHQ.</p>
         </div>
-
-        <div class="site-footer__bottom">
-          <span>© {year} Oropis Research — Small weights, sharp ideas.</span>
-          <div style="display:flex; gap:20px;">
-            <a href="/rss.xml">RSS</a>
-            <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener">Open Source</a>
-          </div>
+        <div class="foot-col">
+          <h2>Sections</h2>
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
         </div>
+        <div class="foot-col">
+          <h2>Oropis</h2>
+          <a href="/about/">About</a>
+          <a href="/contact/">Contact</a>
+          <a href="/corrections/">Corrections</a>
+          <a href="/rss.xml">RSS feed</a>
+        </div>
+        <div class="foot-col">
+          <h2>Legal</h2>
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+          <a href="https://x.com/OropisHQ" rel="me noopener" target="_blank">X / Twitter</a>
+        </div>
+      </div>
+      <div class="wrap foot-bottom">
+        <span>&copy; {new Date().getFullYear()} Oropis</span>
+        <span>Built for the people who watch the replay.</span>
       </div>
     </footer>
   </body>

@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllNews, tagSlug } from '../../lib/news';
+
+const stories = await getAllNews();
+const tags = [...new Set(stories.flatMap((story) => story.data.tags))]
+  .sort((a, b) => a.localeCompare(b))
+  .map((tag) => ({
+    tag,
+    slug: tagSlug(tag),
+    count: stories.filter((story) => story.data.tags.includes(tag)).length,
+  }));
+---
+
+<BaseLayout title="Tags" description="Browse Oropis by tag." noindex>
+  <section class="wrap page-head">
+    <p class="eyebrow">Index</p>
+    <h1>Tags</h1>
+    <p>Teams, players, titles, and themes across the desk.</p>
+  </section>
+
+  <section class="wrap">
+    <ul class="tag-directory">
+      {tags.map((item) => (
+        <li><a href={`/tags/${item.slug}/`}>#{item.tag}<span>{item.count}</span></a></li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

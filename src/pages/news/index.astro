@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsList from '../../components/NewsList.astro';
+import { getAllNews } from '../../lib/news';
+
+const PAGE_SIZE = 12;
+const stories = await getAllNews();
+const totalPages = Math.max(1, Math.ceil(stories.length / PAGE_SIZE));
+const pageStories = stories.slice(0, PAGE_SIZE);
+---
+
+<BaseLayout title="Latest esports news" description="The latest mobile-esports coverage from Oropis: PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile results, roster moves, patches, and business.">
+  <section class="wrap page-head">
+    <p class="eyebrow">The feed</p>
+    <h1>Latest</h1>
+    <p>Everything the Oropis desk has published, newest first. No infinite scroll, no autoplay, no noise.</p>
+  </section>
+
+  <section class="wrap">
+    {stories.length === 0 ? (
+      <div class="empty-state"><h2>No stories yet.</h2><p>The first run is being edited. Follow <a href="https://x.com/OropisHQ" rel="me noopener" target="_blank">@OropisHQ</a> for updates.</p></div>
+    ) : (
+      <NewsList
+        stories={pageStories}
+        page={1}
+        totalPages={totalPages}
+        nextUrl={totalPages > 1 ? '/news/page/2/' : undefined}
+      />
+    )}
+  </section>
+</BaseLayout>

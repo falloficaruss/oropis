@@ -1,81 +1,112 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PostCard from '../components/PostCard.astro';
-import PostRow from '../components/PostRow.astro';
-import { getAllPosts } from '../lib/posts';
+import StoryCard from '../components/StoryCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { COVERED_GAMES, getAllNews, SECTIONS, sectionStories, gameSlug } from '../lib/news';
 
-const posts = await getAllPosts();
-const featuredPost = posts[0]; // TetraNet
-const secondaryPosts = posts.slice(1);
+const stories = await getAllNews();
+const [lead, ...rest] = stories;
+const latest = rest.slice(0, 4);
+const grid = rest.slice(0, 7);
+const sections = (Object.keys(SECTIONS) as Array<keyof typeof SECTIONS>).map((key) => ({
+  key,
+  ...SECTIONS[key],
+  stories: sectionStories(stories.filter((story) => story.id !== lead?.id), key).slice(0, 3),
+}));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Oropis',
+  url: 'https://oropis.com/',
+  description: 'Independent mobile-esports coverage for PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Oropis',
+    url: 'https://oropis.com/',
+    sameAs: ['https://x.com/OropisHQ'],
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://oropis.com/search/?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
 ---
 
-<BaseLayout title="Home" active="">
-  <!-- Hero Section -->
-  <div class="container">
-    <section class="hero">
-      <div class="hero-pill-badge">
-        <span>●</span> Independent Research Lab
-      </div>
-      <h1>
-        Our research investigates the arithmetic, kernels, and hardware systems of low-bit AI models.
-      </h1>
-      <p class="lede">
-        Notes and technical releases on efficient inference, power-of-two quaternary weight grids, and high-throughput edge kernels — published as they happen.
-      </p>
-      <div class="hero-cta-group">
-        <a href="/research" class="btn-primary">
-          Explore Research <span class="arrow">→</span>
-        </a>
-        <a href="/about" class="btn-secondary">
-          About the Lab
-        </a>
-      </div>
-    </section>
-  </div>
-
-  <!-- Featured Publication Showcase -->
-  <div class="container">
-    <div class="section-header">
-      <h2>Featured Research Paper</h2>
-      <span class="meta">Latest Release</span>
-    </div>
-
-    {featuredPost && (
-      <PostCard post={featuredPost} featured={true} />
-    )}
-  </div>
-
-  <!-- Recent Research & Essays Feed -->
-  {secondaryPosts.length > 0 && (
-    <div class="container">
-      <div class="section-header" style="margin-top: 56px;">
-        <h2>Technical Releases &amp; Essays</h2>
-        <a href="/blog" class="btn-secondary" style="font-size:0.82rem; padding: 6px 16px;">View All</a>
-      </div>
-
-      <div class="post-list">
-        {secondaryPosts.map((post) => (
-          <PostRow post={post} />
-        ))}
-      </div>
-    </div>
-  )}
-
-  <!-- Dark Contrast Band -->
-  <section class="dark-band" style="margin-top: 64px;">
-    <div class="container">
-      <h2>Open research code, specialized kernels, and reproducible benchmarks.</h2>
-      <p>
-        Every technical release from Oropis is paired with open-source PyTorch models, custom Triton kernels, and frozen validation data to allow direct reproduction and verification.
-      </p>
-      <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <a href="https://github.com/falloficaruss/oropis" target="_blank" rel="noopener" class="btn-light">
-          Explore Code on GitHub ↗
-        </a>
-        <a href="/about" class="btn-outline-light">
-          About Abhishek Shinde
-        </a>
-      </div>
+<BaseLayout jsonLd={jsonLd}>
+  <section class="home-hero">
+    <div class="wrap">
+      <p class="eyebrow">Mobile esports, reported</p>
+      <h1 class="home-title">Three games. One desk.</h1>
+      <p class="home-dek">PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile — results, roster moves, patches, tournaments, and the business behind the scene, reported and edited rather than aggregated.</p>
     </div>
   </section>
+
+  {stories.length === 0 ? (
+    <section class="wrap empty-state">
+      <p class="eyebrow">Desk open</p>
+      <h2>No stories published yet.</h2>
+      <p>The Oropis news desk is preparing its first run. Check back shortly, or follow <a href="https://x.com/OropisHQ" rel="me noopener" target="_blank">@OropisHQ</a> for updates.</p>
+    </section>
+  ) : (
+    <>
+      <section class:list={['wrap', 'lead-grid', { 'lead-solo': latest.length === 0 }]} aria-labelledby="lead-title">
+        <h2 id="lead-title" class="sr-only">Top story</h2>
+        <StoryCard story={lead} variant="lead" />
+
+        {latest.length > 0 && (
+          <aside class="brief" aria-labelledby="brief-title">
+            <div class="brief-head">
+              <p class="eyebrow" id="brief-title">The brief</p>
+              <a href="/news/">All stories &rarr;</a>
+            </div>
+            <ol class="brief-list">
+              {latest.map((story) => (
+                <li>
+                  <a href={`/news/${story.id}/`}>{story.data.title}</a>
+                  <span>{story.data.game} · {story.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}</span>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )}
+      </section>
+
+      {grid.length > 0 && (
+        <section class="wrap section-block" aria-labelledby="latest-title">
+          <SectionHeader eyebrow="Fresh off the desk" title="Latest" href="/news/" linkLabel="All coverage" />
+          <div class="story-grid">
+            {grid.map((story) => <StoryCard story={story} />)}
+          </div>
+        </section>
+      )}
+
+      {sections.map((section) => section.stories.length > 0 && (
+        <section class="wrap section-block" aria-labelledby={`${section.key}-title`}>
+          <SectionHeader eyebrow="Desk" title={section.title} href={`/${section.key}/`} linkLabel={`More ${section.title.toLowerCase()}`} />
+          <div class="story-grid three">
+            {section.stories.map((story) => <StoryCard story={story} variant="compact" />)}
+          </div>
+        </section>
+      ))}
+
+      <section class="wrap section-block" aria-labelledby="games-title">
+        <SectionHeader eyebrow="Beat map" title="Games we cover" href="/games/" linkLabel="All games" />
+        <ul class="game-chips" id="games-title">
+          {COVERED_GAMES.map((game) => (
+            <li><a href={`/games/${gameSlug(game)}/`}>{game}</a></li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="wrap about-strip">
+        <div>
+          <p class="eyebrow">About the desk</p>
+          <h2>Built for the people who watch the replay.</h2>
+        </div>
+        <p>Oropis is an independent outlet covering mobile esports with original copy, clear sourcing, and no hot-take industrial complex. <a href="/about/">Read our approach &rarr;</a></p>
+      </section>
+    </>
+  )}
 </BaseLayout>

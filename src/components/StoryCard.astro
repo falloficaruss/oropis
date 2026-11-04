@@ -1,0 +1,45 @@
+---
+import { fmtDate, formatArchetype, gameCode, gameSlug, storyUrl, type Story } from '../lib/news';
+
+interface Props {
+  story: Story;
+  variant?: 'lead' | 'standard' | 'compact';
+}
+
+const { story, variant = 'standard' } = Astro.props;
+const { title, description, pubDate, game, archetype, hero, heroCredit, tags } = story.data;
+const url = storyUrl(story);
+const label = formatArchetype(archetype);
+---
+
+<article class:list={['story-card', `story-${variant}`]}>
+  <a class="story-image" href={url} tabindex="-1" aria-hidden="true">
+    {hero ? (
+      <img src={hero} alt="" loading={variant === 'lead' ? 'eager' : 'lazy'} />
+    ) : (
+      <span class="story-image-fallback"><span>{gameCode(game)}</span></span>
+    )}
+    <span class="story-kicker">{label}</span>
+  </a>
+
+  <div class="story-body">
+    <div class="story-meta">
+      <a class="story-game" href={`/games/${gameSlug(game)}/`}>{game}</a>
+      <span aria-hidden="true">/</span>
+      <time datetime={pubDate.toISOString()}>{fmtDate(pubDate)}</time>
+    </div>
+
+    <h3 class="story-title"><a href={url}>{title}</a></h3>
+    <p class="story-dek">{description}</p>
+
+    {tags.length > 0 && (
+      <ul class="tag-row" aria-label="Tags">
+        {tags.slice(0, 3).map((tag) => (
+          <li><a href={`/tags/${tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`}>#{tag}</a></li>
+        ))}
+      </ul>
+    )}
+
+    {hero && heroCredit && <p class="credit">Image: {heroCredit}</p>}
+  </div>
+</article>

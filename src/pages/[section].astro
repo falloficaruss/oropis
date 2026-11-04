@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StoryCard from '../components/StoryCard.astro';
+import { getAllNews, SECTIONS, sectionStories, type SectionKey } from '../lib/news';
+
+export async function getStaticPaths() {
+  const stories = await getAllNews();
+  return (Object.keys(SECTIONS) as SectionKey[]).map((key) => ({
+    params: { section: key },
+    props: { key, stories: sectionStories(stories, key) },
+  }));
+}
+
+const { key, stories } = Astro.props as { key: SectionKey; stories: Awaited<ReturnType<typeof getAllNews>> };
+const section = SECTIONS[key];
+const description = section.description;
+---
+
+<BaseLayout title={section.title} description={description}>
+  <section class="wrap page-head">
+    <p class="eyebrow">Desk</p>
+    <h1>{section.title}</h1>
+    <p>{description}</p>
+  </section>
+
+  <section class="wrap">
+    {stories.length === 0 ? (
+      <div class="empty-state"><h2>Nothing filed here yet.</h2><p>This desk is active. New coverage will appear as it clears editing.</p></div>
+    ) : (
+      <div class="story-grid two">
+        {stories.map((story) => <StoryCard story={story} />)}
+      </div>
+    )}
+  </section>
+</BaseLayout>

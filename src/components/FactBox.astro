@@ -1,0 +1,42 @@
+---
+interface Props {
+  facts: Record<string, unknown>;
+  archetype?: string;
+}
+
+const { facts, archetype } = Astro.props;
+
+const label = (key: string) =>
+  key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+const entries = Object.entries(facts)
+  .filter(([, value]) => value !== null && value !== undefined && value !== '')
+  .filter(([key]) => !['title', 'headline', 'url'].includes(key))
+  .map(([key, value]) => {
+    if (Array.isArray(value)) {
+      return [key, value.map((item) => (typeof item === 'object' ? JSON.stringify(item) : String(item))).join(', ')] as const;
+    }
+    if (typeof value === 'object') {
+      return [key, Object.entries(value as Record<string, unknown>).map(([k, v]) => `${label(k)}: ${String(v)}`).join(' · ')] as const;
+    }
+    return [key, String(value)] as const;
+  })
+  .filter(([, value]) => value.length > 0)
+  .slice(0, 12);
+---
+
+{entries.length > 0 && (
+  <aside class="fact-box" aria-label="Key facts">
+    <p class="eyebrow">{archetype === 'match' || archetype === 'tournament' ? 'Match facts' : 'Key facts'}</p>
+    <dl>
+      {entries.map(([key, value]) => (
+        <div>
+          <dt>{label(key)}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))}
+    </dl>
+  </aside>
+)}

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const updated = 'November 2, 2026';
+---
+
+<BaseLayout title="Privacy" description="Oropis privacy policy.">
+  <section class="wrap page-head">
+    <p class="eyebrow">Legal</p>
+    <h1>Privacy</h1>
+    <p>Last updated: {updated}</p>
+  </section>
+
+  <section class="wrap narrow prose">
+    <h2>The short version</h2>
+    <p>Oropis does not run advertising, analytics, trackers, or newsletter signup forms. We do not sell personal data.</p>
+
+    <h2>What the site collects</h2>
+    <p>The public site is a static website served by GitHub Pages behind Cloudflare. Those providers may process standard request data such as IP address, user agent, and requested URL to deliver and protect the site. Oropis does not receive or maintain a reader database from that traffic.</p>
+
+    <h2>Email</h2>
+    <p>If you email the desk, we receive your address and message. We use them to respond and, where relevant, to verify a tip or correction. We do not add correspondents to a marketing list.</p>
+
+    <h2>External links</h2>
+    <p>Stories link to primary sources and other sites. Those sites have their own privacy practices. Embedded media is not used at launch; hero images are cached locally with credit.</p>
+
+    <h2>Search</h2>
+    <p>Site search runs in your browser against a static index. Search queries are not sent to an Oropis server.</p>
+
+    <h2>Contact</h2>
+    <p>Privacy questions: <a href="mailto:abhishek.shinde@oropis.com">abhishek.shinde@oropis.com</a>.</p>
+  </section>
+</BaseLayout>

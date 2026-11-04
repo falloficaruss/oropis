@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0b0d10"/>
+  <g opacity="0.5">
+    <path d="M0 470 L1200 330" stroke="#26303b" stroke-width="1"/>
+    <path d="M0 510 L1200 370" stroke="#26303b" stroke-width="1"/>
+    <path d="M0 550 L1200 410" stroke="#26303b" stroke-width="1"/>
+    <path d="M0 590 L1200 450" stroke="#26303b" stroke-width="1"/>
+  </g>
+  <circle cx="1040" cy="120" r="240" fill="none" stroke="#ff5a36" stroke-width="2" opacity="0.4"/>
+  <circle cx="1040" cy="120" r="170" fill="none" stroke="#56d8c2" stroke-width="1.5" opacity="0.25"/>
+  <rect x="84" y="86" width="88" height="88" fill="#ff5a36" transform="skewX(-6)"/>
+  <text x="122" y="152" font-family="Georgia, serif" font-size="72" font-weight="700" text-anchor="middle" fill="#0b0d10">O</text>
+  <text x="200" y="150" font-family="Georgia, serif" font-size="62" font-weight="700" fill="#f3f0e9" letter-spacing="-2">Oropis</text>
+  <text x="204" y="190" font-family="monospace" font-size="18" fill="#9aa4af" letter-spacing="5">ESPORTS NEWS</text>
+  <text x="84" y="360" font-family="Georgia, serif" font-size="92" font-weight="600" fill="#f3f0e9" letter-spacing="-4">The server is the story.</text>
+  <text x="88" y="424" font-family="Georgia, serif" font-size="34" fill="#9aa4af">Results, roster moves, patches, and the business of esports.</text>
+  <rect x="88" y="500" width="150" height="5" fill="#ff5a36"/>
+  <text x="88" y="566" font-family="monospace" font-size="20" fill="#6f7a86" letter-spacing="3">OROPIS.COM  /  @OROPISHQ</text>
+</svg>

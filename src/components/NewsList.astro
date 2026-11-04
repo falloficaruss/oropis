@@ -1,0 +1,20 @@
+---
+import StoryCard from './StoryCard.astro';
+import Pagination from './Pagination.astro';
+import type { Story } from '../lib/news';
+
+interface Props {
+  stories: Story[];
+  page: number;
+  totalPages: number;
+  prevUrl?: string;
+  nextUrl?: string;
+}
+
+const { stories, page, totalPages, prevUrl, nextUrl } = Astro.props;
+---
+
+<div class="story-grid two">
+  {stories.map((story) => <StoryCard story={story} />)}
+</div>
+<Pagination page={page} total={totalPages} prevUrl={prevUrl} nextUrl={nextUrl} />

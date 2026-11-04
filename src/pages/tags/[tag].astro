@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import { getAllNews, tagSlug, type Story } from '../../lib/news';
+
+export async function getStaticPaths() {
+  const stories = await getAllNews();
+  const tags = [...new Set(stories.flatMap((story) => story.data.tags))];
+  return tags.map((tag) => ({
+    params: { tag: tagSlug(tag) },
+    props: { tag, stories: stories.filter((story) => story.data.tags.includes(tag)) },
+  }));
+}
+
+const { tag, stories } = Astro.props as { tag: string; stories: Story[] };
+---
+
+<BaseLayout title={`#${tag}`} description={`Oropis coverage tagged ${tag}.`} noindex>
+  <section class="wrap page-head">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Oropis</a><span aria-hidden="true">/</span><a href="/tags/">Tags</a><span aria-hidden="true">/</span><span>#{tag}</span>
+    </nav>
+    <p class="eyebrow">Tag</p>
+    <h1>#{tag}</h1>
+    <p>{stories.length} {stories.length === 1 ? 'story' : 'stories'}.</p>
+  </section>
+
+  <section class="wrap">
+    <div class="story-grid two">
+      {stories.map((story) => <StoryCard story={story} />)}
+    </div>
+  </section>
+</BaseLayout>

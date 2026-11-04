@@ -11,3 +11,10 @@ dist/
 
 # research source pdf (kept local, not in site repo)
 Quaternary_paper.pdf
+
+# local design screenshots (kept out of the repo)
+/article.png
+/home.png
+/home2.png
+/mobile-article.png
+/mobile-home.png

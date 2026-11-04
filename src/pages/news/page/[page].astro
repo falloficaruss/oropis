@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import NewsList from '../../../components/NewsList.astro';
+import { getAllNews } from '../../../lib/news';
+
+export async function getStaticPaths() {
+  const PAGE_SIZE = 12;
+  const stories = await getAllNews();
+  const totalPages = Math.max(1, Math.ceil(stories.length / PAGE_SIZE));
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: { stories, page, totalPages },
+    };
+  });
+}
+
+const PAGE_SIZE = 12;
+const { stories, page, totalPages } = Astro.props;
+const pageStories = stories.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+const prevUrl = page === 2 ? '/news/' : `/news/page/${page - 1}/`;
+const nextUrl = page < totalPages ? `/news/page/${page + 1}/` : undefined;
+---
+
+<BaseLayout title={`Latest esports news — page ${page}`} description={`Page ${page} of Oropis mobile-esports coverage.`}>
+  <section class="wrap page-head">
+    <p class="eyebrow">The feed</p>
+    <h1>Latest</h1>
+    <p>Page {page} of {totalPages}.</p>
+  </section>
+
+  <section class="wrap">
+    <NewsList stories={pageStories} page={page} totalPages={totalPages} prevUrl={prevUrl} nextUrl={nextUrl} />
+  </section>
+</BaseLayout>
