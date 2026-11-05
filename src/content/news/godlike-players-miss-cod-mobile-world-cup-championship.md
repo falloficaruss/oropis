@@ -1,6 +1,6 @@
 ---
 title: GodLike faces CODM Worlds roster scramble after three Mexico visa refusals
-description: Flirt, VipeR and SkullG say their Mexican visa applications were denied, leaving GodLike with a month to resolve its lineup before the Call of Duty: Mobile World Championship Finals.
+description: 'Flirt, VipeR and SkullG say their Mexican visa applications were denied, leaving GodLike with a month to resolve its lineup before the Call of Duty: Mobile World Championship Finals.'
 pubDate: '2026-11-04T09:30:00+00:00'
 author: OropisHQ
 game: 'Call of Duty: Mobile'
