@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { COVERED_BEATS, getAllNews, beatCode, beatSlug, fmtDate } from '../../lib/news';
+
+const stories = await getAllNews();
+const beats = COVERED_BEATS.map((beat) => {
+  const beatStories = stories.filter((story) => story.data.beat === beat);
+  return { beat, slug: beatSlug(beat), count: beatStories.length, latest: beatStories[0] };
+});
+---
+
+<BaseLayout title="Beats we cover" description="Oropis covers artificial intelligence and robotics.">
+  <section class="wrap page-head">
+    <p class="eyebrow">Beat map</p>
+    <h1>Two beats</h1>
+    <p>One desk for artificial intelligence and robotics: the models, the machines, the research behind them, and the industry building them.</p>
+  </section>
+
+  <section class="wrap">
+    <div class="beat-directory">
+      {beats.map((item) => (
+        <a class="beat-tile" href={`/beats/${item.slug}/`}>
+          <span class="beat-monogram" aria-hidden="true">{beatCode(item.beat)}</span>
+          <span class="beat-info">
+            <strong>{item.beat}</strong>
+            <span>{item.count} {item.count === 1 ? 'story' : 'stories'}{item.latest ? ` · latest ${fmtDate(item.latest.data.pubDate)}` : ''}</span>
+          </span>
+          <span class="beat-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,7 +1,7 @@
 # Oropis
 
-The source for [oropis.com](https://oropis.com) — an independent mobile esports desk covering
-**PUBG Mobile / BGMI**, **Free Fire**, and **Call of Duty: Mobile**.
+The source for [oropis.com](https://oropis.com) — independent coverage of **artificial
+intelligence** and **robotics**.
 
 Published stories live in `src/content/news/` as Markdown. The `agg` pipeline owns that
 directory: drafts are edited in the local admin app, published into `site.db`, and exported
@@ -28,8 +28,8 @@ src/
   pages/
     index.astro          # homepage
     news/                # story index, pagination, story pages
-    games/               # per-game hubs
-    [section].astro      # results, transfers, patches, business
+    beats/               # AI and Robotics hubs
+    [section].astro      # AI, robotics, research, industry
     tags/                # tag index and tag pages
     search.astro         # client-side search
     rss.xml.ts
@@ -42,9 +42,9 @@ Do not write story Markdown by hand for normal publishing. Use the `agg` admin a
 `http://127.0.0.1:8091/admin` (SSH tunnel from a laptop), or the CLI:
 
 ```bash
-agg -a gaming site sync --since 72
-agg -a gaming site publish ID
-agg -a gaming site deploy --dry-run
+agg -a oropis site sync --since 72
+agg -a oropis site publish ID
+agg -a oropis site deploy --dry-run
 ```
 
 `site deploy` exports published stories into `src/content/news/`, builds the site, commits,
@@ -72,7 +72,7 @@ Images are uploaded through the story editor in the admin.
   inserts a responsive `<figure>` at the cursor.
 - The server converts uploads to WebP, strips metadata, and resizes to 2000 px
   (hero) or 1600 px (inline).
-- Source files live outside this repo in `gaming/site-media/uploads/`. The exporter
+- Source files live outside this repo in `oropis/site-media/uploads/`. The exporter
   copies them into `public/media/` and tracks them in `src/content/news/.export.json`.
 - Do not hotlink images or add files directly to `public/media/`; the deploy timer
   resets the repo before exporting.

@@ -18,7 +18,7 @@ interface Props {
 
 const {
   title,
-  description = 'Oropis covers PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile with original reporting, results, roster moves, patches, and the business of mobile esports.',
+  description = 'Oropis covers artificial intelligence and robotics with original reporting: frontier models, research, humanoids, autonomy, policy, and the business of the machine economy.',
   image = '/og-default.png',
   type = 'website',
   published,
@@ -28,18 +28,18 @@ const {
 } = Astro.props;
 
 const siteName = 'Oropis';
-const fullTitle = title ? `${title} — Oropis` : `${siteName} — Mobile esports, reported`;
+const fullTitle = title ? `${title} — Oropis` : `${siteName} — Robotics & AI, reported`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL(image, Astro.site);
 const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
 const nav = [
   { href: '/news/', label: 'Latest' },
-  { href: '/results/', label: 'Results' },
-  { href: '/transfers/', label: 'Roster moves' },
-  { href: '/patches/', label: 'Patches' },
-  { href: '/business/', label: 'Business' },
-  { href: '/games/', label: 'Games' },
+  { href: '/ai/', label: 'AI' },
+  { href: '/robotics/', label: 'Robotics' },
+  { href: '/research/', label: 'Research' },
+  { href: '/industry/', label: 'Industry' },
+  { href: '/beats/', label: 'Beats' },
 ];
 
 const isActive = (href: string) => current === href.replace(/\/+$/, '') || current.startsWith(href.replace(/\/+$/, '') + '/');
@@ -89,11 +89,11 @@ const structured = jsonLd
 
     <header class="site-head">
       <div class="wrap head-row">
-        <a class="brand" href="/" aria-label="Oropis Mobile Esports home">
+        <a class="brand" href="/" aria-label="Oropis Robotics and AI home">
           <span class="brand-mark" aria-hidden="true">O</span>
           <span class="brand-text">
             <strong>Oropis</strong>
-            <small>Mobile Esports</small>
+            <small>Robotics &amp; AI</small>
           </span>
         </a>
 
@@ -122,9 +122,9 @@ const structured = jsonLd
         <div class="foot-brand">
           <a class="brand" href="/">
             <span class="brand-mark" aria-hidden="true">O</span>
-            <span class="brand-text"><strong>Oropis</strong><small>Mobile Esports</small></span>
+            <span class="brand-text"><strong>Oropis</strong><small>Robotics &amp; AI</small></span>
           </a>
-          <p>Independent mobile-esports coverage for PUBG Mobile and BGMI, Free Fire, and Call of Duty: Mobile. Reported, edited, and published by OropisHQ.</p>
+          <p>Independent coverage of artificial intelligence and robotics: frontier models, research, humanoids, autonomy, policy, and the business of the machine economy.</p>
         </div>
         <div class="foot-col">
           <h2>Sections</h2>
@@ -146,7 +146,7 @@ const structured = jsonLd
       </div>
       <div class="wrap foot-bottom">
         <span>&copy; {new Date().getFullYear()} Oropis</span>
-        <span>Built for the people who watch the replay.</span>
+        <span>Built for the people who want the signal.</span>
       </div>
     </footer>
   </body>

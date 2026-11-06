@@ -9,7 +9,7 @@ export const GET: APIRoute = async () => {
     title: story.data.title,
     description: story.data.description,
     url: storyUrl(story),
-    game: story.data.game,
+    beat: story.data.beat,
     archetype: story.data.archetype,
     tags: story.data.tags,
     date: story.data.pubDate.toISOString(),

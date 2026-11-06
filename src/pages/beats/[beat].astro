@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import { COVERED_BEATS, getAllNews, beatSlug, type Story } from '../../lib/news';
+
+export async function getStaticPaths() {
+  const stories = await getAllNews();
+  return COVERED_BEATS.map((beat) => ({
+    params: { beat: beatSlug(beat) },
+    props: { beat, stories: stories.filter((story) => story.data.beat === beat) },
+  }));
+}
+
+const { beat, stories } = Astro.props as { beat: string; stories: Story[] };
+---
+
+<BaseLayout title={`${beat} news`} description={`Oropis coverage of ${beat}: products, research, deployments, policy, and industry moves.`}>
+  <section class="wrap page-head">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Oropis</a><span aria-hidden="true">/</span><a href="/beats/">Beats</a><span aria-hidden="true">/</span><span>{beat}</span>
+    </nav>
+    <p class="eyebrow">Beat</p>
+    <h1>{beat}</h1>
+    <p>{stories.length} {stories.length === 1 ? 'story' : 'stories'} published.</p>
+  </section>
+
+  <section class="wrap">
+    {stories.length === 0 ? (
+      <div class="empty-state"><h2>No stories filed yet.</h2><p>This beat is active. Coverage will appear here as stories publish.</p></div>
+    ) : (
+      <div class="story-grid two">
+        {stories.map((story) => <StoryCard story={story} />)}
+      </div>
+    )}
+  </section>
+</BaseLayout>

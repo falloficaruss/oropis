@@ -11,9 +11,9 @@
   <rect x="84" y="86" width="88" height="88" fill="#ff5a36" transform="skewX(-6)"/>
   <text x="122" y="152" font-family="Georgia, serif" font-size="72" font-weight="700" text-anchor="middle" fill="#0b0d10">O</text>
   <text x="200" y="150" font-family="Georgia, serif" font-size="62" font-weight="700" fill="#f3f0e9" letter-spacing="-2">Oropis</text>
-  <text x="204" y="190" font-family="monospace" font-size="18" fill="#9aa4af" letter-spacing="5">ESPORTS NEWS</text>
-  <text x="84" y="360" font-family="Georgia, serif" font-size="92" font-weight="600" fill="#f3f0e9" letter-spacing="-4">The server is the story.</text>
-  <text x="88" y="424" font-family="Georgia, serif" font-size="34" fill="#9aa4af">Results, roster moves, patches, and the business of esports.</text>
+  <text x="204" y="190" font-family="monospace" font-size="18" fill="#9aa4af" letter-spacing="5">ROBOTICS &amp; AI</text>
+  <text x="84" y="360" font-family="Georgia, serif" font-size="92" font-weight="600" fill="#f3f0e9" letter-spacing="-4">The machine is the story.</text>
+  <text x="88" y="424" font-family="Georgia, serif" font-size="34" fill="#9aa4af">Models, robots, research, and the business of the machine economy.</text>
   <rect x="88" y="500" width="150" height="5" fill="#ff5a36"/>
   <text x="88" y="566" font-family="monospace" font-size="20" fill="#6f7a86" letter-spacing="3">OROPIS.COM  /  @OROPISHQ</text>
 </svg>

@@ -2,17 +2,17 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Search" description="Search Oropis coverage." noindex>
+<BaseLayout title="Search" description="Search Oropis coverage of AI and robotics." noindex>
   <section class="wrap page-head">
     <p class="eyebrow">Find it</p>
     <h1>Search</h1>
-    <p>Search published Oropis coverage by headline, game, or tag.</p>
+    <p>Search published Oropis coverage by headline, beat, or tag.</p>
   </section>
 
   <section class="wrap search-shell">
     <form class="search-form" role="search" id="search-form">
       <label class="sr-only" for="search-input">Search Oropis</label>
-      <input id="search-input" name="q" type="search" placeholder="Teams, games, players, patches…" autocomplete="off" />
+      <input id="search-input" name="q" type="search" placeholder="Labs, models, robots, companies…" autocomplete="off" />
       <button type="submit">Search</button>
     </form>
     <p class="search-status" id="search-status" aria-live="polite"></p>
@@ -44,7 +44,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         const meta = document.createElement('p');
         meta.className = 'story-meta';
-        meta.textContent = `${item.game} · ${fmt(item.date)}`;
+        meta.textContent = `${item.beat} · ${fmt(item.date)}`;
 
         const title = document.createElement('h2');
         const link = document.createElement('a');
@@ -75,12 +75,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         }
 
         const matches = items.filter((item) => {
-          const haystack = [item.title, item.description, item.game, item.archetype, ...(item.tags || [])].join(' ').toLowerCase();
+          const haystack = [item.title, item.description, item.beat, item.archetype, ...(item.tags || [])].join(' ').toLowerCase();
           return haystack.includes(query);
         });
 
         status.textContent = `${matches.length} ${matches.length === 1 ? 'result' : 'results'} for “${input.value.trim()}”.`;
-        results.replaceChildren(...(matches.length ? matches.map(card) : [Object.assign(document.createElement('p'), { className: 'empty-state', textContent: 'No stories matched. Try a team name or a game.' })]));
+        results.replaceChildren(...(matches.length ? matches.map(card) : [Object.assign(document.createElement('p'), { className: 'empty-state', textContent: 'No stories matched. Try a lab, company, model, or robot.' })]));
       };
 
       form.addEventListener('submit', (event) => {

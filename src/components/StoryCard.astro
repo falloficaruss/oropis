@@ -1,5 +1,5 @@
 ---
-import { fmtDate, formatArchetype, gameCode, gameSlug, storyUrl, type Story } from '../lib/news';
+import { fmtDate, formatArchetype, beatCode, beatSlug, storyUrl, type Story } from '../lib/news';
 
 interface Props {
   story: Story;
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { story, variant = 'standard' } = Astro.props;
-const { title, description, pubDate, game, archetype, hero, heroCredit, tags } = story.data;
+const { title, description, pubDate, beat, archetype, hero, heroCredit, tags } = story.data;
 const url = storyUrl(story);
 const label = formatArchetype(archetype);
 ---
@@ -17,14 +17,14 @@ const label = formatArchetype(archetype);
     {hero ? (
       <img src={hero} alt="" loading={variant === 'lead' ? 'eager' : 'lazy'} />
     ) : (
-      <span class="story-image-fallback"><span>{gameCode(game)}</span></span>
+      <span class="story-image-fallback"><span>{beatCode(beat)}</span></span>
     )}
     <span class="story-kicker">{label}</span>
   </a>
 
   <div class="story-body">
     <div class="story-meta">
-      <a class="story-game" href={`/games/${gameSlug(game)}/`}>{game}</a>
+      <a class="story-beat" href={`/beats/${beatSlug(beat)}/`}>{beat}</a>
       <span aria-hidden="true">/</span>
       <time datetime={pubDate.toISOString()}>{fmtDate(pubDate)}</time>
     </div>

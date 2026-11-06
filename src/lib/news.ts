@@ -33,56 +33,71 @@ export function isoDate(date: Date): string {
   return date.toISOString();
 }
 
-export function gameSlug(game: string): string {
-  return game
+export function slugify(value: string): string {
+  return value
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 }
 
-export function tagSlug(tag: string): string {
-  return gameSlug(tag);
+export function beatSlug(beat: string): string {
+  return slugify(beat);
 }
 
-export const COVERED_GAMES = ['PUBG Mobile', 'Free Fire', 'Call of Duty: Mobile'] as const;
+export function tagSlug(tag: string): string {
+  return slugify(tag);
+}
 
-const GAME_CODES: Record<string, string> = {
-  'PUBG Mobile': 'PUBGM',
-  'Free Fire': 'FF',
-  'Call of Duty: Mobile': 'CODM',
+export const COVERED_BEATS = ['AI', 'Robotics'] as const;
+
+const BEAT_CODES: Record<string, string> = {
+  AI: 'AI',
+  Robotics: 'ROB',
 };
 
-export function gameCode(game: string): string {
-  return GAME_CODES[game] ?? game.slice(0, 2).toUpperCase();
+export function beatCode(beat: string): string {
+  return BEAT_CODES[beat] ?? beat.slice(0, 3).toUpperCase();
 }
 
-export const SECTIONS = {
-  results: {
-    title: 'Results & schedule',
-    description: 'Match results, upcoming series, brackets, and tournament schedules.',
-    archetypes: ['match', 'tournament'],
+interface SectionDef {
+  title: string;
+  description: string;
+  beats?: readonly string[];
+  archetypes?: readonly string[];
+}
+
+export const SECTIONS: Record<string, SectionDef> = {
+  ai: {
+    title: 'Artificial intelligence',
+    description: 'Frontier models, agents, products, and the state of the art — explained without the hype.',
+    beats: ['AI'],
   },
-  transfers: {
-    title: 'Roster moves',
-    description: 'Signings, departures, free agents, and coach changes across the mobile scene.',
-    archetypes: ['roster'],
+  robotics: {
+    title: 'Robotics',
+    description: 'Humanoids, industrial arms, autonomous fleets, drones, and the systems moving into the physical world.',
+    beats: ['Robotics'],
   },
-  patches: {
-    title: 'Patches & meta',
-    description: 'Patch notes, balance changes, and what they mean for competitive play.',
-    archetypes: ['patch'],
+  research: {
+    title: 'Research',
+    description: 'Papers, benchmarks, labs, and the results that change what machines can do.',
+    archetypes: ['research'],
   },
-  business: {
-    title: 'Esports business',
-    description: 'Sponsorships, funding, layoffs, ownership, and the money behind mobile esports.',
-    archetypes: ['business'],
+  industry: {
+    title: 'Industry',
+    description: 'Funding, regulation, standards, and the business of building intelligent machines.',
+    archetypes: ['funding', 'business', 'policy'],
   },
-} as const;
+};
 
 export type SectionKey = keyof typeof SECTIONS;
 
 export function sectionStories(stories: Story[], key: SectionKey): Story[] {
-  const allowed = SECTIONS[key].archetypes as readonly string[];
+  const section = SECTIONS[key];
+  if (!section) return [];
+  if (section.beats) {
+    return stories.filter((story) => section.beats!.includes(story.data.beat));
+  }
+  const allowed = section.archetypes ?? [];
   return stories.filter((story) => allowed.includes(story.data.archetype));
 }
 
@@ -91,7 +106,7 @@ export function relatedStories(story: Story, all: Story[], limit = 3): Story[] {
     .filter((candidate) => candidate.id !== story.id)
     .map((candidate) => {
       let score = 0;
-      if (candidate.data.game === story.data.game) score += 3;
+      if (candidate.data.beat === story.data.beat) score += 3;
       const shared = candidate.data.tags.filter((tag) => story.data.tags.includes(tag));
       score += shared.length;
       return { candidate, score };

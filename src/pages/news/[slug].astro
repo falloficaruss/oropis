@@ -9,7 +9,7 @@ import {
   relatedStories,
   fmtDateLong,
   formatArchetype,
-  gameSlug,
+  beatSlug,
   storyUrl,
 } from '../../lib/news';
 
@@ -19,7 +19,7 @@ export async function getStaticPaths() {
 }
 
 const { story, stories } = Astro.props;
-const { title, description, pubDate, updatedDate, author, game, archetype, tags, hero, heroCredit, heroAlt, sources } = story.data;
+const { title, description, pubDate, updatedDate, author, beat, archetype, tags, hero, heroCredit, heroAlt, sources } = story.data;
 const { Content } = await render(story);
 const related = relatedStories(story, stories);
 const canonical = new URL(storyUrl(story), Astro.site).toString();
@@ -35,7 +35,7 @@ const jsonLd = {
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
   url: canonical,
   image: [new URL(hero ?? '/og-default.png', Astro.site).toString()],
-  articleSection: game,
+  articleSection: beat,
   keywords: tags.join(', '),
   author: { '@type': 'Organization', name: author, url: 'https://oropis.com/about/' },
   publisher: {
@@ -68,7 +68,7 @@ const jsonLd = {
       </nav>
 
       <div class="article-meta">
-        <a class="pill" href={`/games/${gameSlug(game)}/`}>{game}</a>
+        <a class="pill" href={`/beats/${beatSlug(beat)}/`}>{beat}</a>
         <span class="pill ghost">{label}</span>
       </div>
 

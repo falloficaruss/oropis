@@ -15,7 +15,7 @@ const news = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     author: z.string().default('OropisHQ'),
-    game: z.string().default('Esports'),
+    beat: z.string().default('AI'),
     archetype: z.string().default('news'),
     format: z.string().default('news'),
     tags: z.array(z.string()).default([]),
