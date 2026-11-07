@@ -9,8 +9,6 @@ author: OropisHQ
 beat: Robotics
 archetype: product
 format: news
-hero: /images/agility-robotics.webp
-heroAlt: "Agility Robotics"
 tags: []
 sources:
 - name: robotics_business_review
