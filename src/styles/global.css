@@ -895,6 +895,22 @@ input {
   border: 1px solid var(--line);
 }
 
+.prose .katex {
+  font-size: 1.05em;
+  color: var(--ink);
+}
+
+.prose .katex-display {
+  margin: 1.6em 0;
+  padding: 4px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.prose .katex-display > .katex {
+  font-size: 1.15em;
+}
+
 .prose table {
   width: 100%;
   margin: 1.4em 0;
