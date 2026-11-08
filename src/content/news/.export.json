@@ -1,9 +1,11 @@
 {
   "files": [
+    "why-large-language-models-solve-graduate-mathematics-yet-fail-at-deter.md",
     "how-moonlake-ai-uses-calibrated-simulation-and-world-models-to-scale-r.md",
     "how-did-agility-robotics-perform-on-its-first-day-on-the-stock-market.md"
   ],
   "media": [
+    "why-large-language-models-solve-graduate-mathematics-yet-fail-at-deter/hero.webp",
     "how-moonlake-ai-uses-calibrated-simulation-and-world-models-to-scale-r/hero.jpg"
   ],
   "redirects": []
