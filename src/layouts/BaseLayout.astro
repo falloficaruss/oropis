@@ -5,6 +5,12 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import 'katex/dist/katex.min.css';
 import '../styles/global.css';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import { GA_ID, GA_ENABLED } from '../lib/analytics';
+
+const gtagSrc = GA_ENABLED
+  ? `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`
+  : 'https://www.googletagmanager.com/gtag/js';
 
 interface Props {
   title?: string;
@@ -63,7 +69,7 @@ const structured = jsonLd
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
-    <meta name="theme-color" content="#0b0d10" />
+    <meta name="theme-color" content="#ffffff" />
 
     <script
       is:inline
@@ -71,6 +77,37 @@ const structured = jsonLd
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4197092338559183"
       crossorigin="anonymous"
     ></script>
+
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      });
+      try {
+        var storedConsent = localStorage.getItem('oropis-consent');
+        if (storedConsent === 'granted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
+          });
+        }
+      } catch (e) {}
+    </script>
+    <script is:inline async src={gtagSrc}></script>
+    {GA_ENABLED && (
+      <script is:inline define:vars={{ GA_ID }}>
+        gtag('config', GA_ID, { anonymize_ip: true });
+      </script>
+    )}
 
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
@@ -98,7 +135,7 @@ const structured = jsonLd
     <header class="site-head">
       <div class="wrap head-row">
         <a class="brand" href="/" aria-label="Oropis Robotics and AI home">
-          <span class="brand-mark" aria-hidden="true">O</span>
+          <img class="brand-mark" src="/oropis-mark.svg" alt="" width="32" height="32" />
           <span class="brand-text">
             <strong>Oropis</strong>
             <small>Robotics &amp; AI</small>
@@ -129,7 +166,7 @@ const structured = jsonLd
       <div class="wrap foot-grid">
         <div class="foot-brand">
           <a class="brand" href="/">
-            <span class="brand-mark" aria-hidden="true">O</span>
+            <img class="brand-mark" src="/oropis-mark.svg" alt="" width="32" height="32" />
             <span class="brand-text"><strong>Oropis</strong><small>Robotics &amp; AI</small></span>
           </a>
           <p>Independent coverage of artificial intelligence and robotics: frontier models, research, humanoids, autonomy, policy, and the business of the machine economy.</p>
@@ -149,6 +186,7 @@ const structured = jsonLd
           <h2>Legal</h2>
           <a href="/privacy/">Privacy</a>
           <a href="/terms/">Terms</a>
+          <button type="button" class="foot-link" id="cookie-settings">Cookie settings</button>
           <a href="https://x.com/OropisHQ" rel="me noopener" target="_blank">X / Twitter</a>
         </div>
       </div>
@@ -157,5 +195,7 @@ const structured = jsonLd
         <span>Built for the people who want the signal.</span>
       </div>
     </footer>
+
+    <ConsentBanner />
   </body>
 </html>

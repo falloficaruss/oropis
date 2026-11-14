@@ -1,0 +1,81 @@
+---
+import { CONSENT_KEY } from '../lib/analytics';
+---
+
+<div
+  id="consent-banner"
+  class="consent"
+  role="dialog"
+  aria-modal="false"
+  aria-live="polite"
+  aria-label="Cookie consent"
+  hidden
+>
+  <div class="consent-inner wrap">
+    <p class="consent-copy">
+      We use cookies for analytics and advertising. Essential cookies keep the site working.
+      Non-essential cookies are off unless you accept them.
+      <a href="/privacy/">Read our privacy policy</a>.
+    </p>
+    <div class="consent-actions">
+      <button type="button" class="button ghost" data-consent="denied">Reject non-essential</button>
+      <button type="button" class="button" data-consent="granted">Accept all</button>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ CONSENT_KEY }}>
+  (function () {
+    var banner = document.getElementById('consent-banner');
+    if (!banner) return;
+
+    function apply(choice) {
+      var granted = choice === 'granted' ? 'granted' : 'denied';
+      if (typeof window.gtag === 'function') {
+        window.gtag('consent', 'update', {
+          ad_storage: granted,
+          ad_user_data: granted,
+          ad_personalization: granted,
+          analytics_storage: granted,
+        });
+      }
+    }
+
+    function choose(choice) {
+      try {
+        localStorage.setItem(CONSENT_KEY, choice);
+      } catch (e) {}
+      apply(choice);
+      banner.hidden = true;
+    }
+
+    var stored = null;
+    try {
+      stored = localStorage.getItem(CONSENT_KEY);
+    } catch (e) {}
+
+    if (stored === 'granted' || stored === 'denied') {
+      apply(stored);
+    } else {
+      banner.hidden = false;
+    }
+
+    banner.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target || typeof target.getAttribute !== 'function') return;
+      var choice = target.getAttribute('data-consent');
+      if (choice === 'granted' || choice === 'denied') {
+        event.preventDefault();
+        choose(choice);
+      }
+    });
+
+    var reopen = document.getElementById('cookie-settings');
+    if (reopen) {
+      reopen.addEventListener('click', function (event) {
+        event.preventDefault();
+        banner.hidden = false;
+      });
+    }
+  })();
+</script>
