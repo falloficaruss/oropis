@@ -1,6 +1,6 @@
 ---
 title: Why Large Language Models Solve Graduate Mathematics Yet Fail at Deterministic
-  Board Games
+  Board Games/
 description: This post analyzes why frontier large language models (LLMs) can solve
   graduate-level mathematics yet routinely blunder against intermediate chess players,
   attributing the capability gap to architectural and structural asymmetries
