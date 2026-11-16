@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>Editorial desk</h1>
+  <p class="muted">Review the queue, write original copy, publish to {{ site.base_url }}.</p>
+  {% if not configured %}
+  <div class="flash error">
+    Set <code>SITE_ADMIN_USER</code> and <code>SITE_ADMIN_PASSWORD</code> in
+    <code>~/.config/agg/site.env</code>, then restart the service.
+  </div>
+  {% endif %}
+  <form method="post" action="/admin/login" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Username <input name="username" autocomplete="username" autofocus required></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="primary" type="submit">Sign in</button>
+  </form>
+  <p class="muted small">Access is localhost-only. Use an SSH tunnel from your laptop.</p>
+</section>
+{% endblock %}

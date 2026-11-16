@@ -1,0 +1,43 @@
+[project]
+name = "agg"
+version = "0.1.0"
+description = "Robotics and AI news aggregator and editorial desk for Oropis"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.27",
+    "feedparser>=6.0",
+    "rich>=13.7",
+    "pydantic>=2.6",
+    "PyYAML>=6.0",
+    "lxml>=5.0",
+    "trafilatura>=1.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+web = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "markdown-it-py>=3.0",
+    "itsdangerous>=2.2",
+    "Pillow>=11.0",
+]
+
+[project.scripts]
+agg = "agg.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agg*"]
+
+[tool.setuptools.package-data]
+"agg.site" = ["templates/*.html", "static/*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

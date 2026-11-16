@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CloudBand from '../components/CloudBand.astro';
+import StoryCard from '../components/StoryCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { COVERED_BEATS, getAllNews, SECTIONS, beatSlug, type SectionKey } from '../lib/news';
+
+const stories = await getAllNews();
+const [lead, ...rest] = stories;
+const latest = rest.slice(0, 8);
+const desks = (Object.keys(SECTIONS) as SectionKey[]).map((key, index) => ({
+  key,
+  index: index + 1,
+  ...SECTIONS[key],
+}));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Oropis',
+  url: 'https://oropis.com/',
+  description: 'Independent coverage of artificial intelligence and robotics: frontier models, research, humanoids, autonomy, policy, and the business of the machine economy.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Oropis',
+    url: 'https://oropis.com/',
+    sameAs: ['https://x.com/OropisHQ'],
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://oropis.com/search/?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
+---
+
+<BaseLayout jsonLd={jsonLd}>
+  {stories.length === 0 ? (
+    <section class="wrap empty-state">
+      <p class="eyebrow">Desk open</p>
+      <h2>No stories published yet.</h2>
+      <p>The Oropis desk is preparing its first run. Check back shortly, or follow <a href="https://x.com/OropisHQ" rel="me noopener" target="_blank">@OropisHQ</a> for updates.</p>
+    </section>
+  ) : (
+    <>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="wrap hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow">Robotics &amp; AI, reported</p>
+            <h1 class="hero-title" id="hero-title">The signal, <span class="hl">without</span> the noise.</h1>
+            <p class="hero-lede">Original reporting on frontier models, humanoids, autonomy, and the business of the machine economy — checked against primary sources.</p>
+            <div class="hero-actions">
+              <a class="button" href="/news/">Read the latest</a>
+              <a class="button ghost" href="/rss.xml">Get the RSS</a>
+            </div>
+          </div>
+          <StoryCard story={lead} variant="lead" />
+        </div>
+        <CloudBand />
+      </section>
+
+      <section class="wrap brief-bar" aria-label="From the desk">
+        <p class="brief-label">From the desk</p>
+        <div class="desk-note">
+          <p>No infinite scroll. No autoplay. No unreviewed copy. Every story is human-edited and checked against primary sources.</p>
+          <a class="section-link" href="/about/">How we report &rarr;</a>
+        </div>
+      </section>
+
+      {latest.length > 0 && (
+        <section class="wrap section-block">
+          <SectionHeader eyebrow="Fresh off the desk" title="Latest" href="/news/" linkLabel="All coverage" />
+          <div class="story-rows">
+            {latest.map((story) => <StoryCard story={story} variant="row" />)}
+          </div>
+        </section>
+      )}
+
+      <section class="wrap section-block">
+        <SectionHeader eyebrow="The desks" title="Explore Oropis" href="/beats/" linkLabel="All beats" />
+        <div class="desk-links">
+          {desks.map((desk) => (
+            <a class="desk-link" href={`/${desk.key}/`}>
+              <span class="desk-link-kicker">Desk {String(desk.index).padStart(2, '0')}</span>
+              <strong>{desk.title}</strong>
+              <span>{desk.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="wrap section-block">
+        <SectionHeader eyebrow="Beat map" title="Beats we cover" href="/beats/" linkLabel="All beats" />
+        <ul class="beat-chips">
+          {COVERED_BEATS.map((beat) => (
+            <li><a href={`/beats/${beatSlug(beat)}/`}>{beat}</a></li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="wrap about-strip">
+        <div>
+          <p class="eyebrow">About the desk</p>
+          <h2>Built for the people who want the signal.</h2>
+        </div>
+        <p>Oropis is an independent outlet covering artificial intelligence and robotics with original copy, clear sourcing, and no hype cycle. <a href="/about/">Read our approach &rarr;</a></p>
+      </section>
+    </>
+  )}
+</BaseLayout>

@@ -1,0 +1,10 @@
+[Unit]
+Description=Sync agg site drafts every 30 minutes (%i)
+
+[Timer]
+OnCalendar=*:0/30
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

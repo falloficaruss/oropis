@@ -1,0 +1,13 @@
+[Unit]
+Description=agg site draft sync (%i)
+After=network-online.target agg@%i.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/twitter/%i
+EnvironmentFile=%h/.config/agg/site.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=%h/twitter/.venv/bin/python -m agg -a %h/twitter/%i site sync --since 72 --limit 300
+Nice=10
+TimeoutStartSec=600

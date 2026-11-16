@@ -1,0 +1,25 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter((heading) => heading.depth === 2 && heading.text.trim().length > 0);
+---
+
+{items.length > 1 && (
+  <nav class="toc" aria-labelledby="toc-title">
+    <p class="eyebrow" id="toc-title">On this page</p>
+    <ol>
+      {items.map((heading) => (
+        <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+      ))}
+    </ol>
+  </nav>
+)}

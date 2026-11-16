@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Revisions{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Revisions</h1><p class="muted">{{ story['headline'] }}</p></div>
+  <a class="button ghost" href="/admin/story/{{ story['id'] }}">Back to editor</a>
+</div>
+<section class="panel">
+  {% if revisions %}
+  <table>
+    <thead><tr><th>ID</th><th>When</th><th>Status</th><th>Headline</th><th></th></tr></thead>
+    <tbody>
+      {% for r in revisions %}
+      <tr>
+        <td class="mono">{{ r['id'] }}</td>
+        <td class="mono">{{ fmt_ts(r['created_ts']) }}</td>
+        <td><span class="status {{ r['status'] }}">{{ r['status'] }}</span></td>
+        <td>{{ r['headline'] }}</td>
+        <td>
+          <form method="post" action="/admin/story/{{ story['id'] }}/restore/{{ r['id'] }}">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button class="button small" type="submit">Restore</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No revisions yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

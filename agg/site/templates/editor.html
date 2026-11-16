@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Story {{ story['id'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="muted mono">{% if manual %}manual draft{% else %}cluster {{ story['cluster_id'] }} · score {{ "%.2f"|format(story['score']) }}{% endif %} · {{ story['archetype'] or 'news' }}</p>
+    <h1>{{ story['headline'] or '(untitled)' }}</h1>
+    <p class="muted">Status <span class="status {{ story['status'] }}">{{ story['status'] }}</span>
+      {% if story['slug'] %}· <span class="mono">/news/{{ story['slug'] }}/</span>{% endif %}
+    </p>
+  </div>
+  <div class="actions">
+    <a class="button ghost" href="/admin/story/{{ story['id'] }}/preview">Preview</a>
+    <a class="button ghost" href="/admin/story/{{ story['id'] }}/revisions">Revisions</a>
+    {% if not manual %}
+    <a class="button ghost" href="/admin/story/{{ story['id'] }}?refresh=1" onclick="return confirm('Re-snapshot the packet? This overwrites sources and facts from the source packet.')">Re-snapshot packet</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="editor-grid">
+  <div>
+    <form method="post" action="/admin/story/{{ story['id'] }}/save" class="panel stack" id="editor-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="action" id="action-field" value="save">
+      <label>Headline
+        <input name="headline" value="{{ story['headline'] }}" required>
+      </label>
+      <div class="grid two">
+        <label>Slug
+          <input name="slug" value="{{ story['slug'] or '' }}" placeholder="auto on publish">
+        </label>
+        <label>Author
+          <input name="author" value="{{ story['author'] }}">
+        </label>
+      </div>
+      <label>Dek / summary
+        <textarea name="dek" rows="3">{{ story['dek'] }}</textarea>
+      </label>
+      <label>Body (Markdown)
+        <textarea name="body_md" rows="18" required>{{ story['body_md'] }}</textarea>
+      </label>
+      <div class="grid three">
+        <label>Beat
+          <input name="beat" value="{{ story['beat'] or '' }}">
+        </label>
+        <label>Archetype
+          <select name="archetype">
+            {% for a in ['research', 'product', 'deployment', 'funding', 'policy', 'business', 'news'] %}
+            <option value="{{ a }}" {% if story['archetype'] == a %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Format
+          <select name="format">
+            {% for f in ['news', 'launch', 'research', 'analysis', 'feature', 'policy', 'funding', 'deployment'] %}
+            <option value="{{ f }}" {% if story['format'] == f %}selected{% endif %}>{{ f }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <label>Tags (comma separated)
+        <input name="tags" value="{{ tags }}">
+      </label>
+      <label>Facts JSON (score, teams, event, numbers)
+        <textarea name="facts_json" rows="5" class="mono">{{ facts }}</textarea>
+      </label>
+      <label>Sources (one per line: publisher | title | URL)
+        <textarea name="sources" rows="4" class="mono" placeholder="TalkEsport | Story title | https://example.com/story">{{ sources_text }}</textarea>
+      </label>
+      <div class="grid two">
+        <label>Hero image URL
+          <input name="hero_url" value="{{ story['hero_url'] or '' }}">
+        </label>
+        <label>Hero credit
+          <input name="hero_credit" value="{{ story['hero_credit'] or '' }}">
+        </label>
+      </div>
+      <label>Hero alt text
+        <input name="hero_alt" value="{{ story['hero_alt'] or '' }}" placeholder="Describe the image for screen readers">
+      </label>
+      <label>X post URL (optional)
+        <input name="x_post_url" value="{{ story['x_post_url'] or '' }}">
+      </label>
+      <div class="actions">
+        <button class="button" type="submit" onclick="document.getElementById('action-field').value='save'">Save draft</button>
+        <button class="primary" type="submit" onclick="document.getElementById('action-field').value='publish'">Save &amp; publish</button>
+      </div>
+    </form>
+
+    <section class="panel stack" id="images">
+      <div class="panel-head">
+        <h2>Images</h2>
+        <p class="muted small">JPEG, PNG, or WebP. The server converts to WebP, strips metadata, and resizes.</p>
+      </div>
+      <div class="image-grid">
+        <div class="image-card">
+          <h3>Hero image</h3>
+          <div class="hero-preview-wrap">
+            <img id="hero-preview" class="image-preview" src="{% if story['hero_local'] %}/media/{{ story['hero_local'] }}{% elif story['hero_url'] %}{{ story['hero_url'] }}{% endif %}" alt="{{ story['hero_alt'] or '' }}" {% if not story['hero_local'] and not story['hero_url'] %}hidden{% endif %}>
+            <div id="hero-empty" class="image-empty" {% if story['hero_local'] or story['hero_url'] %}hidden{% endif %}>No hero image</div>
+          </div>
+          <form class="image-form stack" data-kind="hero" data-url="/admin/story/{{ story['id'] }}/image">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <label>Image file
+              <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required>
+            </label>
+            <div class="grid two">
+              <label>Alt text
+                <input name="alt" value="{{ story['hero_alt'] or '' }}">
+              </label>
+              <label>Credit
+                <input name="credit" value="{{ story['hero_credit'] or '' }}">
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Upload hero</button>
+              <span class="image-status"></span>
+            </div>
+          </form>
+          {% if story['hero_local'] or story['hero_url'] %}
+          <form method="post" action="/admin/story/{{ story['id'] }}/hero/delete">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button class="danger small" type="submit">Remove hero</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <div class="image-card">
+          <h3>Inline images</h3>
+          <form class="image-form stack" data-kind="inline" data-url="/admin/story/{{ story['id'] }}/image">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <label>Image file
+              <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required>
+            </label>
+            <label>Alt text (required)
+              <input name="alt" required>
+            </label>
+            <div class="grid two">
+              <label>Caption
+                <input name="caption">
+              </label>
+              <label>Credit
+                <input name="credit">
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Upload &amp; insert</button>
+              <span class="image-status"></span>
+            </div>
+          </form>
+          {% if media %}
+          <ul class="media-list">
+            {% for m in media %}
+            <li class="media-item">
+              <img src="{{ m['url'] }}" alt="{{ m['alt'] }}">
+              <div class="media-meta">
+                <strong>{{ m['original_name'] or 'image' }}</strong>
+                <span class="muted small">{{ m['width'] or '?' }}×{{ m['height'] or '?' }} · {{ ((m['bytes'] or 0) / 1024)|round|int }} KB</span>
+                {% if m['caption'] %}<span>{{ m['caption'] }}</span>{% endif %}
+                {% if m['credit'] %}<span class="muted small">Credit: {{ m['credit'] }}</span>{% endif %}
+              </div>
+              <div class="media-actions">
+                <button class="small" type="button" data-insert-image="{{ m['markdown']|e }}">Insert</button>
+                <form method="post" action="/admin/story/{{ story['id'] }}/image/{{ m['id'] }}/delete">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <button class="danger small" type="submit">Delete</button>
+                </form>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="muted small">No inline images yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <div class="panel stack">
+      <h2>Actions</h2>
+      <div class="actions">
+        <button class="primary" type="submit" form="editor-form"
+                onclick="document.getElementById('action-field').value='publish'">Publish</button>
+        {% if story['status'] == 'published' %}
+        <form method="post" action="/admin/story/{{ story['id'] }}/unpublish">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="button" type="submit">Unpublish</button>
+        </form>
+        {% endif %}
+        {% if story['status'] != 'rejected' %}
+        <form method="post" action="/admin/story/{{ story['id'] }}/reject">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="danger" type="submit">Reject</button>
+        </form>
+        {% endif %}
+      </div>
+      <p class="muted small">Published stories keep their curated sources when republished. Use Re-snapshot only when you intentionally want the packet to replace them. Publishing queues a static deploy.</p>
+    </div>
+  </div>
+
+  <aside class="stack">
+    <section class="panel">
+      <h2>Sources</h2>
+      {% if sources %}
+      <ul class="sources">
+        {% for s in sources %}
+        <li>
+          <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.publisher or s.name }}</a>
+          <span class="muted small">{{ s.name }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No sources captured.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <h2>Packet</h2>
+      {% if numbers %}
+      <p class="small"><strong>Numbers:</strong> {{ numbers|join(', ') }}</p>
+      {% endif %}
+      {% if angles %}
+      <ul class="angles">
+        {% for a in angles %}<li>{{ a }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      {% if items %}
+      <details>
+        <summary>Source titles ({{ items|length }})</summary>
+        <ul class="titles">
+          {% for i in items %}
+          <li><span class="muted small">{{ i.source }}</span> {{ i.title }}</li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% endif %}
+      {% if packet %}
+      <details>
+        <summary>Full drafting packet</summary>
+        <pre>{{ packet }}</pre>
+      </details>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const body = document.querySelector('textarea[name="body_md"]');
+  const mainForm = document.querySelector('form[action$="/save"]');
+  const insertBlock = (text) => {
+    if (!body || !text) return;
+    const start = body.selectionStart ?? body.value.length;
+    const end = body.selectionEnd ?? body.value.length;
+    const before = body.value.slice(0, start).replace(/\s+$/, '');
+    const after = body.value.slice(end).replace(/^\s+/, '');
+    body.value = before + (before ? '\n\n' : '') + text + (after ? '\n\n' + after : '');
+    body.focus();
+    const pos = body.value.length - after.length;
+    body.setSelectionRange(pos, pos);
+  };
+  document.querySelectorAll('[data-insert-image]').forEach((button) => {
+    button.addEventListener('click', () => insertBlock(button.dataset.insertImage));
+  });
+  document.querySelectorAll('form.image-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const status = form.querySelector('.image-status');
+      status.className = 'image-status';
+      status.textContent = 'Uploading…';
+      const response = await fetch(form.dataset.url, {
+        method: 'POST',
+        body: new FormData(form),
+        credentials: 'same-origin',
+      });
+      let payload = { ok: false, error: 'upload failed' };
+      try { payload = await response.json(); } catch (_) {}
+      if (!response.ok || !payload.ok) {
+        status.className = 'image-status bad';
+        status.textContent = payload.error || 'Upload failed';
+        return;
+      }
+      if (payload.kind === 'hero') {
+        const preview = document.getElementById('hero-preview');
+        preview.src = payload.url;
+        preview.hidden = false;
+        document.getElementById('hero-empty').hidden = true;
+        form.querySelector('[name="alt"]').value = payload.alt || '';
+        form.querySelector('[name="credit"]').value = payload.credit || '';
+        if (mainForm) {
+          mainForm.querySelector('[name="hero_url"]').value = '';
+          mainForm.querySelector('[name="hero_alt"]').value = payload.alt || '';
+          mainForm.querySelector('[name="hero_credit"]').value = payload.credit || '';
+        }
+        status.className = 'image-status ok';
+        status.textContent = 'Hero saved. Publish or save to deploy.';
+      } else {
+        insertBlock(payload.markdown);
+        form.querySelector('[name="file"]').value = '';
+        status.className = 'image-status ok';
+        status.textContent = 'Inserted into the body. Save to keep it.';
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

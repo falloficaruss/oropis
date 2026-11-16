@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Queue{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Review queue</h1>
+    <p class="muted">{{ rows|length }} stories · nothing publishes without review</p>
+  </div>
+  <div class="actions">
+    <a class="button primary" href="/admin/new">New article</a>
+  </div>
+</div>
+
+<form method="get" action="/admin/queue" class="filters">
+  <label>Status
+    <select name="status_filter">
+      {% for value in ['open', 'new', 'draft', 'published', 'rejected'] %}
+      <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Beat
+    <select name="beat">
+      <option value="">All beats</option>
+      {% for b in beats %}
+      <option value="{{ b }}" {% if beat == b %}selected{% endif %}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Archetype
+    <select name="archetype">
+      <option value="">All types</option>
+      {% for a in ['research', 'product', 'deployment', 'funding', 'policy', 'business', 'news'] %}
+      <option value="{{ a }}" {% if archetype == a %}selected{% endif %}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button class="button" type="submit">Filter</button>
+  <a class="button ghost" href="/admin/queue">Reset</a>
+</form>
+
+<section class="panel">
+  {% if rows %}
+  <table>
+    <thead><tr><th>ID</th><th>Added</th><th>Beat</th><th>Type</th><th>Headline</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td class="mono">{{ row['id'] }}</td>
+        <td class="mono">{{ fmt_age(row['created_ts']) }}</td>
+        <td>{{ row['beat'] or '—' }}</td>
+        <td><span class="badge">{{ row['archetype'] or 'news' }}</span></td>
+        <td><a href="/admin/story/{{ row['id'] }}">{{ row['headline'] or '(untitled)' }}</a></td>
+        <td><span class="status {{ row['status'] }}">{{ row['status'] }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">Nothing here. Try a wider filter, or run <code>agg -a oropis fetch</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}
