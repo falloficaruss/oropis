@@ -49,6 +49,25 @@ even if `SHOW_DRAFTS=true` is set.
 
 Set `draft: false` when the essay is ready to publish.
 
+## Launch gate
+
+A production build requires at least 12 essays with `draft: false`. Check
+readiness with:
+
+```bash
+npm run launch-check
+```
+
+It prints the count, for example `0 of 12 essays ready`, and exits non-zero
+until the threshold is met. Until then, `npm run build` fails with a clear
+message. To preview an incomplete build:
+
+```bash
+ALLOW_INCOMPLETE_LAUNCH=true npm run build
+```
+
+The override is for local previews only. Publishing is still a manual step.
+
 ## Media
 
 Every essay has its own media folder:

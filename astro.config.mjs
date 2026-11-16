@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import launchGate from './integrations/launch-gate.mjs';
 import mediaFolder from './integrations/media.mjs';
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes('/404') && !page.endsWith('/rss.xml'),
     }),
+    launchGate(),
     mediaFolder(),
   ],
 });

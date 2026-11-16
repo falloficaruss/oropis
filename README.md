@@ -22,8 +22,23 @@ npm run build
 npm run preview
 ```
 
-The build is static and can be hosted on GitHub Pages. There is no automatic
-deploy configured; publishing is a deliberate manual step.
+The production build enforces the launch gate: it fails until at least 12
+published essays exist. Check readiness with:
+
+```bash
+npm run launch-check
+```
+
+It exits non-zero until the threshold is met. To build an incomplete preview
+without changing the gate:
+
+```bash
+ALLOW_INCOMPLETE_LAUNCH=true npm run build
+```
+
+The override only affects the local build. The build is static and can be hosted
+on GitHub Pages. There is no automatic deploy configured; publishing is a
+deliberate manual step.
 
 ## Content
 
