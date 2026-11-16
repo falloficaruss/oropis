@@ -1,0 +1,26 @@
+---
+import type { Essay } from '../lib/essays';
+import { essayUrl, formatDate, readingMinutes, topicLabel } from '../lib/essays';
+
+interface Props {
+  essay: Essay;
+  showTopic?: boolean;
+}
+
+const { essay, showTopic = true } = Astro.props;
+const { title, summary, topic, date, slug, draft } = essay.data;
+---
+
+<article class="essay-card">
+  <a class="card-link" href={essayUrl(essay)} aria-labelledby={`card-title-${slug}`}>
+    {showTopic && <span class="eyebrow">{topicLabel(topic)}</span>}
+    <h3 id={`card-title-${slug}`}>{title}</h3>
+    <p class="card-summary">{summary}</p>
+    <p class="card-meta">
+      <time datetime={date.toISOString()}>{formatDate(date)}</time>
+      <span aria-hidden="true"> · </span>
+      {readingMinutes(essay)} min read
+      {draft && <span class="draft-badge">Draft</span>}
+    </p>
+  </a>
+</article>

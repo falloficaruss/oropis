@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#f6f3ec"/>
+  <circle cx="1010" cy="160" r="210" fill="#8a3b2d"/>
+  <rect x="90" y="120" width="260" height="390" fill="#1d1c19"/>
+  <path d="M350 510 L520 120 L690 510 Z" fill="none" stroke="#1d1c19" stroke-width="14"/>
+  <circle cx="1010" cy="160" r="74" fill="#f6f3ec"/>
+  <text x="90" y="560" font-family="Georgia, 'Times New Roman', serif" font-size="76" fill="#1d1c19">Oropis</text>
+  <text x="92" y="600" font-family="Arial, Helvetica, sans-serif" font-size="24" letter-spacing="4" fill="#625d54">ROBOTICS · AI · FINANCE</text>
+</svg>

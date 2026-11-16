@@ -1,0 +1,24 @@
+---
+import { SITE } from '../config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <div class="footer-brand">
+      <a href="/">{SITE.name}</a>
+      <p>{SITE.tagline}</p>
+    </div>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="/archive/">Archive</a>
+      <a href="/rss.xml">RSS</a>
+      <a href="/about/">About</a>
+      <a href="/about/#privacy">Privacy</a>
+      <button type="button" id="cookie-settings">Cookie settings</button>
+    </nav>
+    <p class="footer-legal">
+      © {year} {SITE.name}. Essays are original work. Site code is MIT licensed.
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Oropis">
+  <rect width="64" height="64" rx="12" fill="#f6f3ec"/>
+  <circle cx="30" cy="34" r="17" fill="none" stroke="#8a3b2d" stroke-width="6"/>
+  <path d="M40 24 L54 10" stroke="#1d1c19" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="54" cy="10" r="5" fill="#8a3b2d"/>
+</svg>

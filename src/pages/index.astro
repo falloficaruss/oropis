@@ -1,40 +1,95 @@
 ---
-import { draftsVisible, essayUrl, formatDate, getEssays, readingMinutes } from '../lib/essays';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EssayCard from '../components/EssayCard.astro';
+import { TOPIC_META } from '../config/site';
+import {
+  TOPICS,
+  essayUrl,
+  formatDate,
+  getEssays,
+  readingMinutes,
+  topicLabel,
+} from '../lib/essays';
 
 const essays = await getEssays();
-const drafts = draftsVisible();
+const featured = essays.find((essay) => essay.data.hero_image) ?? essays[0];
+const remaining = featured
+  ? essays.filter((essay) => essay.data.slug !== featured.data.slug)
+  : essays;
+
+const rows = TOPICS.map((topic) => ({
+  topic,
+  essays: remaining.filter((essay) => essay.data.topic === topic).slice(0, 3),
+}));
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Oropis</title>
-    <meta name="description" content="Essays on robotics, artificial intelligence, and finance." />
-  </head>
-  <body>
-    <main>
-      <h1>Oropis</h1>
-      <p>
-        {essays.length} essay{essays.length === 1 ? '' : 's'} visible
-        {drafts ? ' (drafts included in development)' : ''}.
-      </p>
-      {
-        essays.length === 0 ? (
-          <p>No published essays yet.</p>
-        ) : (
-          <ul>
-            {essays.map((essay) => (
-              <li>
-                <a href={essayUrl(essay)}>{essay.data.title}</a>
-                <span> — {formatDate(essay.data.date)} — {readingMinutes(essay)} min read</span>
-                {essay.data.draft ? <strong> — DRAFT</strong> : null}
-              </li>
-            ))}
-          </ul>
-        )
-      }
-    </main>
-  </body>
-</html>
+<BaseLayout current="/">
+  {
+    featured ? (
+      <section
+        class:list={['feature', 'shell', { 'feature--text': !featured.data.hero_image }]}
+        aria-labelledby="featured-title"
+      >
+        <div class="feature-copy">
+          <p class="eyebrow">{topicLabel(featured.data.topic)}</p>
+          <h1 id="featured-title">
+            <a href={essayUrl(featured)}>{featured.data.title}</a>
+          </h1>
+          <p class="feature-summary">{featured.data.summary}</p>
+          <p class="meta">
+            <time datetime={featured.data.date.toISOString()}>{formatDate(featured.data.date)}</time>
+            <span aria-hidden="true"> · </span>
+            {readingMinutes(featured)} min read
+            {featured.data.draft && <span class="draft-badge">Draft</span>}
+          </p>
+          <a class="read-link" href={essayUrl(featured)}>
+            Read the essay <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        {
+          featured.data.hero_image && (
+            <figure class="feature-media">
+              <img
+                src={featured.data.hero_image}
+                alt={featured.data.hero_alt}
+                width="1600"
+                height="900"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </figure>
+          )
+        }
+      </section>
+    ) : (
+      <section class="empty-state shell">
+        <p class="eyebrow">Oropis</p>
+        <h1>The first essay is being written.</h1>
+        <p>Check the archive soon, or subscribe to the RSS feed.</p>
+      </section>
+    )
+  }
+
+  <div class="shell">
+    {
+      rows.map(({ topic, essays: topicEssays }) =>
+        topicEssays.length > 0 ? (
+          <section class="topic-row" aria-labelledby={`topic-${topic}`}>
+            <div class="section-head">
+              <h2 id={`topic-${topic}`}>{TOPIC_META[topic].label}</h2>
+              <a class="section-link" href={`/${topic}/`}>
+                All {TOPIC_META[topic].label.toLowerCase()} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+            <div class="card-grid">
+              {topicEssays.map((essay) => (
+                <EssayCard essay={essay} />
+              ))}
+            </div>
+          </section>
+        ) : null,
+      )
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EssayCard from '../components/EssayCard.astro';
+import { TOPIC_META } from '../config/site';
+import { TOPICS, getEssaysByTopic, type Topic } from '../lib/essays';
+
+export function getStaticPaths() {
+  return TOPICS.map((topic) => ({ params: { topic }, props: { topic } }));
+}
+
+const { topic } = Astro.props as { topic: Topic };
+const meta = TOPIC_META[topic];
+const essays = await getEssaysByTopic(topic);
+---
+
+<BaseLayout title={meta.title} description={meta.description} current={`/${topic}/`}>
+  <section class="page-head shell">
+    <p class="eyebrow">Topic</p>
+    <h1>{meta.title}</h1>
+    <p class="page-dek">{meta.description}</p>
+  </section>
+
+  <section class="shell">
+    <h2 class="visually-hidden">Essays in {meta.title}</h2>
+    {
+      essays.length > 0 ? (
+        <div class="essay-list">
+          {essays.map((essay) => (
+            <EssayCard essay={essay} showTopic={false} />
+          ))}
+        </div>
+      ) : (
+        <div class="essay-list">
+          <p>No essays in this topic yet.</p>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

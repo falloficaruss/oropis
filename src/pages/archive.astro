@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+  essayUrl,
+  formatDate,
+  getEssays,
+  readingMinutes,
+  topicLabel,
+} from '../lib/essays';
+
+const essays = await getEssays();
+const years = new Map<string, typeof essays>();
+
+for (const essay of essays) {
+  const year = String(essay.data.date.getUTCFullYear());
+  const group = years.get(year) ?? [];
+  group.push(essay);
+  years.set(year, group);
+}
+---
+
+<BaseLayout
+  title="Archive"
+  description="Every Oropis essay, newest first."
+  current="/archive/"
+>
+  <section class="page-head shell">
+    <p class="eyebrow">Index</p>
+    <h1>Archive</h1>
+    <p class="page-dek">Every essay, newest first.</p>
+  </section>
+
+  <section class="shell archive">
+    {
+      years.size === 0 ? (
+        <p>No published essays yet.</p>
+      ) : (
+        [...years.entries()].map(([year, items]) => (
+          <section class="archive-year" aria-labelledby={`year-${year}`}>
+            <h2 id={`year-${year}`}>{year}</h2>
+            <ul class="archive-list">
+              {items.map((essay) => (
+                <li>
+                  <a href={essayUrl(essay)}>
+                    <span class="archive-date">
+                      <time datetime={essay.data.date.toISOString()}>
+                        {formatDate(essay.data.date)}
+                      </time>
+                    </span>
+                    <span class="archive-topic">{topicLabel(essay.data.topic)}</span>
+                    <span class="archive-title">{essay.data.title}</span>
+                    <span class="archive-time">{readingMinutes(essay)} min</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      )
+    }
+  </section>
+</BaseLayout>

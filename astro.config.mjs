@@ -6,5 +6,10 @@ export default defineConfig({
   site: 'https://oropis.com',
   output: 'static',
   trailingSlash: 'always',
-  integrations: [sitemap(), mediaFolder()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/404') && !page.endsWith('/rss.xml'),
+    }),
+    mediaFolder(),
+  ],
 });

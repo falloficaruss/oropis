@@ -68,10 +68,10 @@ Rules:
 
 - Use lowercase, hyphenated filenames.
 - Reference hero images from frontmatter as `/media/<slug>/<filename>`.
+- Hero images should be 1600×900 (16:9).
 - Reference inline images in Markdown as `![alt text](/media/<slug>/<filename>)`.
 - Every image needs meaningful alt text. Do not leave alt text empty.
-- Prefer WebP, AVIF, or SVG. Use `loading="lazy"` and explicit dimensions for
-  inline images when possible.
+- Prefer WebP, AVIF, or SVG. Hero images load eagerly because they are above the fold.
 
 ## Essay body
 

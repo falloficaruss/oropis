@@ -1,0 +1,132 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EssayCard from '../../components/EssayCard.astro';
+import { SITE, TOPIC_META } from '../../config/site';
+import {
+  essayUrl,
+  formatDate,
+  getEssays,
+  readingMinutes,
+  relatedEssays,
+  topicLabel,
+} from '../../lib/essays';
+
+export async function getStaticPaths() {
+  const essays = await getEssays();
+  return essays.map((essay) => ({
+    params: { slug: essay.data.slug },
+    props: { essay },
+  }));
+}
+
+const { essay } = Astro.props;
+const { Content } = await render(essay);
+const all = await getEssays();
+const related = relatedEssays(essay, all);
+const url = essayUrl(essay);
+const socialImage =
+  essay.data.hero_image && !essay.data.hero_image.endsWith('.svg')
+    ? essay.data.hero_image
+    : '/og-default.png';
+const canonicalUrl = new URL(url, Astro.site ?? SITE.url).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: essay.data.title,
+  description: essay.data.summary,
+  datePublished: essay.data.date.toISOString(),
+  mainEntityOfPage: canonicalUrl,
+  url: canonicalUrl,
+  image: [new URL(socialImage, Astro.site ?? SITE.url).toString()],
+  articleSection: topicLabel(essay.data.topic),
+  author: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/favicon.svg', Astro.site ?? SITE.url).toString(),
+    },
+  },
+};
+---
+
+<BaseLayout
+  title={essay.data.title}
+  description={essay.data.summary}
+  image={socialImage}
+  type="article"
+  published={essay.data.date}
+  canonical={url}
+  current={`/${essay.data.topic}/`}
+  jsonLd={jsonLd}
+>
+  <article class="essay">
+    <header class="essay-head reading">
+      <p class="eyebrow">{topicLabel(essay.data.topic)}</p>
+      <h1>{essay.data.title}</h1>
+      <p class="essay-summary">{essay.data.summary}</p>
+      <p class="essay-meta">
+        <time datetime={essay.data.date.toISOString()}>{formatDate(essay.data.date)}</time>
+        <span aria-hidden="true"> · </span>
+        {readingMinutes(essay)} min read
+        {essay.data.draft && <span class="draft-badge">Draft</span>}
+      </p>
+      {
+        essay.data.medium_url && (
+          <p class="essay-original">
+            <a href={essay.data.medium_url} target="_blank" rel="noopener noreferrer">
+              Read the original on Medium
+            </a>
+          </p>
+        )
+      }
+    </header>
+
+    {
+      essay.data.hero_image && (
+        <figure class="essay-hero">
+          <img
+            src={essay.data.hero_image}
+            alt={essay.data.hero_alt}
+            width="1600"
+            height="900"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </figure>
+      )
+    }
+
+    <div class="essay-body reading prose">
+      <Content />
+    </div>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="related shell" aria-labelledby="related-title">
+        <div class="section-head">
+          <h2 id="related-title">Related essays</h2>
+          <a class="section-link" href={`/${essay.data.topic}/`}>
+            All {TOPIC_META[essay.data.topic].label.toLowerCase()}{' '}
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        <div class="card-grid">
+          {related.map((item) => (
+            <EssayCard essay={item} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
