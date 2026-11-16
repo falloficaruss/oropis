@@ -9,6 +9,12 @@ npm install
 npm run dev
 ```
 
+To preview drafts locally:
+
+```bash
+SHOW_DRAFTS=true npm run dev
+```
+
 ## Build
 
 ```bash
@@ -22,4 +28,5 @@ deploy configured; publishing is a deliberate manual step.
 ## Content
 
 Essays live in `content/essays/` as Markdown files. Images live in
-`media/<slug>/`. See `CONTENT-GUIDE.md` once the content structure is in place.
+`media/<slug>/`. See `CONTENT-GUIDE.md` for the frontmatter, naming rules,
+draft behavior, and media layout.

@@ -1,6 +1,8 @@
 ---
-const title = 'Oropis';
-const description = 'Essays on robotics, artificial intelligence, and finance.';
+import { draftsVisible, essayUrl, formatDate, getEssays, readingMinutes } from '../lib/essays';
+
+const essays = await getEssays();
+const drafts = draftsVisible();
 ---
 
 <!doctype html>
@@ -8,13 +10,31 @@ const description = 'Essays on robotics, artificial intelligence, and finance.';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>Oropis</title>
+    <meta name="description" content="Essays on robotics, artificial intelligence, and finance." />
   </head>
   <body>
     <main>
-      <h1>{title}</h1>
-      <p>Rebuild in progress.</p>
+      <h1>Oropis</h1>
+      <p>
+        {essays.length} essay{essays.length === 1 ? '' : 's'} visible
+        {drafts ? ' (drafts included in development)' : ''}.
+      </p>
+      {
+        essays.length === 0 ? (
+          <p>No published essays yet.</p>
+        ) : (
+          <ul>
+            {essays.map((essay) => (
+              <li>
+                <a href={essayUrl(essay)}>{essay.data.title}</a>
+                <span> — {formatDate(essay.data.date)} — {readingMinutes(essay)} min read</span>
+                {essay.data.draft ? <strong> — DRAFT</strong> : null}
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </main>
   </body>
 </html>
