@@ -1,0 +1,43 @@
+---
+layout: page
+title: Living Bottleneck Tracker
+subtitle: "Moving data with light and doing math with light, audited as separate hardware tracks."
+permalink: /tracker/
+wide: true
+---
+{% assign bottlenecks = site.data.bottlenecks %}
+{% if bottlenecks and bottlenecks.size > 0 %}
+  <div class="tracker">
+    <table class="tracker-table">
+      <caption class="visually-hidden">Living bottleneck tracker entries</caption>
+      <thead>
+        <tr>
+          <th scope="col">Bottleneck</th>
+          <th scope="col">Track</th>
+          <th scope="col">Stage</th>
+          <th scope="col">Key metric</th>
+          <th scope="col">Status</th>
+          <th scope="col">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in bottlenecks %}
+          <tr>
+            <td data-label="Bottleneck">
+              <span class="tracker-table__name">{{ item.name }}</span>
+              {% if item.note %}<span class="tracker-table__note">{{ item.note }}</span>{% endif %}
+              {% if item.source %}<a class="tracker-table__source" href="{{ item.source }}">Source</a>{% endif %}
+            </td>
+            <td data-label="Track">{{ item.track | default: "—" }}</td>
+            <td data-label="Stage"><span class="mono">{{ item.stage | default: "—" }}</span></td>
+            <td data-label="Key metric" class="mono">{{ item.metric | default: "—" }}</td>
+            <td data-label="Status">{{ item.status | default: "—" }}</td>
+            <td data-label="Updated" class="mono">{{ item.updated | default: "—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty-state">Coming soon.</p>
+{% endif %}

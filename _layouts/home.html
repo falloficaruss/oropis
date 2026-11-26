@@ -1,0 +1,29 @@
+---
+layout: default
+---
+<div class="home">
+  <header class="home__intro">
+    <h1 class="home__title">{{ site.title }}</h1>
+    <p class="home__description">{{ site.description }}</p>
+  </header>
+
+  {% if site.posts.size > 0 %}
+    <section aria-labelledby="essays-heading">
+      <h2 class="section-label" id="essays-heading">Essays</h2>
+      <ul class="essay-list">
+        {% for post in site.posts %}
+          <li class="essay-list__item">
+            <div class="essay-list__meta">
+              {% if post.pillar %}<span class="pillar-label">{{ post.pillar }}</span>{% endif %}
+              <time class="mono" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+            </div>
+            <h3 class="essay-list__title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+            {% if post.subtitle %}<p class="essay-list__subtitle">{{ post.subtitle }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% else %}
+    <p class="empty-state">Coming soon.</p>
+  {% endif %}
+</div>

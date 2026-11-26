@@ -1,0 +1,28 @@
+title: Oropis
+description: "Bottleneck journalism on photonic computing and optical AI infrastructure."
+lang: en
+
+url: "https://oropis.com"
+baseurl: ""
+
+permalink: "/essays/:title/"
+
+plugins:
+  - jekyll-feed
+
+kramdown:
+  math_engine: null
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+exclude:
+  - README.md
+  - workflow
+  - Gemfile
+  - Gemfile.lock
+  - vendor
