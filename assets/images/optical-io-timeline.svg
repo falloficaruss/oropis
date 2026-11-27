@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="timelineTitle timelineDesc">
+  <title id="timelineTitle">Optical I/O: demoed, shipped, promised, 2025-2028</title>
+  <desc id="timelineDesc">Four-lane timeline of Ayar Labs, Lightmatter, Marvell and Celestial AI, and Nvidia optical I/O events from Q3 2025 through Q4 2028, with marker types for confirmed, demo-only, and promised items, plus a falsification test window.</desc>
+  <style>
+    svg {
+      --text: #1f1f1d;
+      --muted: #555550;
+      --neutral: #888780;
+      --marker-bg: #ffffff;
+      --band: rgba(136, 135, 128, 0.08);
+      --leader: rgba(85, 85, 80, 0.62);
+      --ayar: #1D9E75;
+      --lightmatter: #7F77DD;
+      --marvell: #378ADD;
+      --nvidia: #888780;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --text: #f4f4ef;
+        --muted: #cfcfc7;
+        --neutral: #c7c7be;
+        --marker-bg: #1e1e1e;
+        --band: rgba(255, 255, 255, 0.07);
+        --leader: rgba(244, 244, 239, 0.55);
+      }
+    }
+    .title { fill: var(--text); font-size: 24px; font-weight: 700; }
+    .legend-label { fill: var(--text); font-size: 13px; }
+    .lane-label { fill: var(--text); font-size: 14px; font-weight: 700; }
+    .year-label { fill: var(--text); font-size: 14px; font-weight: 700; }
+    .quarter-label { fill: var(--muted); font-size: 13px; }
+    .event-label { fill: var(--text); font-size: 13px; }
+    .overlay-label { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .band-label { fill: var(--muted); font-size: 13px; font-weight: 600; }
+    .leader { fill: none; stroke: var(--leader); stroke-width: 1; stroke-linecap: round; }
+    .axis { stroke: var(--neutral); stroke-width: 1.2; }
+    .tick { stroke: var(--neutral); stroke-width: 1; }
+    .lane { fill: none; stroke-width: 2; }
+  </style>
+
+  <rect x="591.5" y="138" width="267.1" height="494" fill="var(--band)"/>
+
+  <text class="title" x="30" y="32">Optical I/O: demoed, shipped, promised, 2025-2028</text>
+
+  <g aria-label="Marker legend">
+<circle class="" cx="250.0" cy="66" r="6" fill="var(--neutral)" stroke="var(--neutral)" stroke-width="1"/>
+    <text class="legend-label" x="266" y="70">Confirmed event</text>
+<g class=""><circle cx="480.0" cy="66" r="6" fill="var(--marker-bg)" stroke="var(--neutral)" stroke-width="1.4"/><path d="M480.0,60 A6,6 0 0 0 480.0,72 Z" fill="var(--neutral)"/></g>
+    <text class="legend-label" x="496" y="70">Demo or reference platform only</text>
+<circle class="" cx="800.0" cy="66" r="6" fill="var(--marker-bg)" stroke="var(--neutral)" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+    <text class="legend-label" x="816" y="70">Promised or planned, not yet delivered</text>
+  </g>
+
+  <line class="axis" x1="210" y1="138" x2="1160" y2="138"/>
+  <line class="tick" x1="210.0" y1="138" x2="210.0" y2="132"/>
+  <line class="tick" x1="277.9" y1="138" x2="277.9" y2="132"/>
+  <line class="tick" x1="345.7" y1="138" x2="345.7" y2="132"/>
+  <line class="tick" x1="413.6" y1="138" x2="413.6" y2="132"/>
+  <line class="tick" x1="481.4" y1="138" x2="481.4" y2="132"/>
+  <line class="tick" x1="549.3" y1="138" x2="549.3" y2="132"/>
+  <line class="tick" x1="617.1" y1="138" x2="617.1" y2="132"/>
+  <line class="tick" x1="685.0" y1="138" x2="685.0" y2="132"/>
+  <line class="tick" x1="752.9" y1="138" x2="752.9" y2="132"/>
+  <line class="tick" x1="820.7" y1="138" x2="820.7" y2="132"/>
+  <line class="tick" x1="888.6" y1="138" x2="888.6" y2="132"/>
+  <line class="tick" x1="956.4" y1="138" x2="956.4" y2="132"/>
+  <line class="tick" x1="1024.3" y1="138" x2="1024.3" y2="132"/>
+  <line class="tick" x1="1092.1" y1="138" x2="1092.1" y2="132"/>
+  <line class="tick" x1="1160.0" y1="138" x2="1160.0" y2="132"/>
+  <text class="quarter-label" x="243.9" y="156" text-anchor="middle">Q3</text>
+  <text class="quarter-label" x="311.8" y="156" text-anchor="middle">Q4</text>
+  <text class="quarter-label" x="379.6" y="156" text-anchor="middle">Q1</text>
+  <text class="quarter-label" x="447.5" y="156" text-anchor="middle">Q2</text>
+  <text class="quarter-label" x="515.4" y="156" text-anchor="middle">Q3</text>
+  <text class="quarter-label" x="583.2" y="156" text-anchor="middle">Q4</text>
+  <text class="quarter-label" x="651.1" y="156" text-anchor="middle">Q1</text>
+  <text class="quarter-label" x="718.9" y="156" text-anchor="middle">Q2</text>
+  <text class="quarter-label" x="786.8" y="156" text-anchor="middle">Q3</text>
+  <text class="quarter-label" x="854.6" y="156" text-anchor="middle">Q4</text>
+  <text class="quarter-label" x="922.5" y="156" text-anchor="middle">Q1</text>
+  <text class="quarter-label" x="990.4" y="156" text-anchor="middle">Q2</text>
+  <text class="quarter-label" x="1058.2" y="156" text-anchor="middle">Q3</text>
+  <text class="quarter-label" x="1126.1" y="156" text-anchor="middle">Q4</text>
+  <text class="year-label" x="277.9" y="116" text-anchor="middle">2025</text>
+  <text class="year-label" x="481.4" y="116" text-anchor="middle">2026</text>
+  <text class="year-label" x="752.9" y="116" text-anchor="middle">2027</text>
+  <text class="year-label" x="1024.3" y="116" text-anchor="middle">2028</text>
+
+  <line x1="591.5" y1="108" x2="591.5" y2="632" stroke="var(--text)" stroke-width="1.2" opacity="0.72"/>
+  <text class="overlay-label" x="591.5" y="104" text-anchor="middle">Today: 27 Nov 2026</text>
+
+  <rect x="18" y="212" width="4" height="16" rx="2" fill="#1D9E75"/>
+  <text class="lane-label" x="30" y="225">Ayar Labs</text>
+  <line class="lane" x1="210" y1="220" x2="1160" y2="220" stroke="#1D9E75"/>
+  <rect x="18" y="317" width="4" height="16" rx="2" fill="#7F77DD"/>
+  <text class="lane-label" x="30" y="330">Lightmatter</text>
+  <line class="lane" x1="210" y1="325" x2="1160" y2="325" stroke="#7F77DD"/>
+  <rect x="18" y="422" width="4" height="16" rx="2" fill="#378ADD"/>
+  <text class="lane-label" x="30" y="435">Marvell / Celestial AI</text>
+  <line class="lane" x1="210" y1="430" x2="1160" y2="430" stroke="#378ADD"/>
+  <rect x="18" y="527" width="4" height="16" rx="2" fill="#888780"/>
+  <text class="lane-label" x="30" y="540">Context: Nvidia</text>
+  <line class="lane" x1="210" y1="535" x2="1160" y2="535" stroke="#888780"/>
+
+<circle class="" cx="400.7" cy="220" r="6" fill="#1D9E75" stroke="#1D9E75" stroke-width="1"/>
+<path class="leader" d="M400.7 213.0 L370.0 195.0"/>
+<text class="event-label" x="370" y="190" text-anchor="middle">$500M raise at $3.75B valuation</text>
+<circle class="" cx="537.3" cy="220" r="6" fill="#1D9E75" stroke="#1D9E75" stroke-width="1"/>
+<path class="leader" d="M537.3 227.0 L470.0 240.0"/>
+<text class="event-label" x="470" y="252" text-anchor="middle">+$150M, $650M raised in 2026</text>
+<g class=""><circle cx="578.9" cy="220" r="6" fill="var(--marker-bg)" stroke="#1D9E75" stroke-width="1.4"/><path d="M578.9,214 A6,6 0 0 0 578.9,226 Z" fill="#1D9E75"/></g>
+<path class="leader" d="M578.9 213.0 L690.0 197.0"/>
+<text class="event-label" x="690" y="176" text-anchor="middle"><tspan x="690" y="176">100+ Tbps per accelerator</tspan><tspan x="690" y="192">demo (8 engines)</tspan></text>
+
+<path class="leader" d="M537.3 227.0 L760.0 258.0"/>
+<text class="event-label" x="760" y="270" text-anchor="middle">No named hyperscale deployment public yet (Sep 2026)</text>
+<g class=""><circle cx="233.0" cy="325" r="6" fill="var(--marker-bg)" stroke="#7F77DD" stroke-width="1.4"/><path d="M233.0,319 A6,6 0 0 0 233.0,331 Z" fill="#7F77DD"/></g>
+<path class="leader" d="M233.0 318.0 L250.0 302.0"/>
+<text class="event-label" x="250" y="281" text-anchor="middle"><tspan x="250" y="281">M1000 interposer billed</tspan><tspan x="250" y="297">(still a reference platform)</tspan></text>
+<circle class="" cx="400.7" cy="325" r="6" fill="#7F77DD" stroke="#7F77DD" stroke-width="1"/>
+<path class="leader" d="M400.7 332.0 L401.0 345.0"/>
+<text class="event-label" x="401" y="357" text-anchor="middle">vClick detachable fiber unit</text>
+<circle class="" cx="469.0" cy="325" r="6" fill="var(--marker-bg)" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M469.0 318.0 L490.0 302.0"/>
+<text class="event-label" x="490" y="281" text-anchor="middle"><tspan x="490" y="281">L200 billed for 2026</tspan><tspan x="490" y="297">(no volume evidence found)</tspan></text>
+<g class=""><circle cx="559.6" cy="325" r="6" fill="var(--marker-bg)" stroke="#7F77DD" stroke-width="1.4"/><path d="M559.6,319 A6,6 0 0 0 559.6,331 Z" fill="#7F77DD"/></g>
+<path class="leader" d="M559.6 332.0 L700.0 341.0"/>
+<text class="event-label" x="700" y="353" text-anchor="middle"><tspan x="700" y="353">NPOs in manufacturing</tspan><tspan x="700" y="369">5 CPO tape-outs</tspan><tspan x="700" y="385">2 interposer designs in development</tspan></text>
+<circle class="" cx="762.2" cy="325" r="6" fill="var(--marker-bg)" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M762.2 318.0 L762.0 302.0"/>
+<text class="event-label" x="762" y="297" text-anchor="middle">NPO shipments (secondary report)</text>
+<circle class="" cx="1011.6" cy="325" r="6" fill="var(--marker-bg)" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M1011.6 332.0 L1012.0 345.0"/>
+<text class="event-label" x="1012" y="357" text-anchor="middle">High-volume CPO (secondary report)</text>
+<circle class="" cx="380.0" cy="430" r="6" fill="#378ADD" stroke="#378ADD" stroke-width="1"/>
+<path class="leader" d="M380.0 423.0 L380.0 407.0"/>
+<text class="event-label" x="380" y="402" text-anchor="middle">Celestial AI deal closed</text>
+<circle class="" cx="559.6" cy="430" r="6" fill="#378ADD" stroke="#378ADD" stroke-width="1"/>
+<path class="leader" d="M559.6 437.0 L465.0 450.0"/>
+<text class="event-label" x="465" y="462" text-anchor="middle"><tspan x="465" y="462">Investor day: scale-up optics</tspan><tspan x="465" y="478">near-zero revenue today</tspan></text>
+<circle class="" cx="808.2" cy="430" r="6" fill="var(--marker-bg)" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M808.2 423.0 L808.0 407.0"/>
+<text class="event-label" x="808" y="402" text-anchor="middle">Scale-up CPO ships to one large customer</text>
+<circle class="" cx="853.5" cy="430" r="6" fill="var(--marker-bg)" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M853.5 437.0 L880.0 484.0"/>
+<text class="event-label" x="880" y="496" text-anchor="middle">Ramp</text>
+<circle class="" cx="1079.8" cy="535" r="6" fill="var(--marker-bg)" stroke="#888780" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+<path class="leader" d="M1079.8 542.0 L1000.0 555.0"/>
+<text class="event-label" x="1000" y="567" text-anchor="middle">Scale-up CPO with Feynman (analyst reports)</text>
+
+  <text class="band-label" x="725.1" y="606" text-anchor="middle">Falsification test window,</text>
+  <text class="band-label" x="725.1" y="622" text-anchor="middle">ends 22 Nov 2027</text>
+</svg>

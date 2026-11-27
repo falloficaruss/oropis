@@ -409,6 +409,25 @@ a:hover {
   margin: 2.5em 0;
 }
 
+.prose figure img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.prose figure.figure-wide {
+  width: min(calc(100vw - 2 * var(--gutter)), var(--page));
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+.prose figure.figure-wide figcaption {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .prose figcaption {
   margin-top: 0.75rem;
   color: var(--muted);

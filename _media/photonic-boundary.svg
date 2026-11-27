@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">Where does the photonic boundary sit?</title>
+  <desc id="diagramDesc">Three side-view cross-sections compare where optics sit relative to an AI chip package: a modular optical engine with an external laser, a photonic interposer under the die, and an optical chiplet co-designed with the ASIC.</desc>
+  <style>
+    svg {
+      --silicon: #888780;
+      --silicon-stroke: #6f6f69;
+      --substrate: #888780;
+      --substrate-stroke: #6d6d67;
+      --teal: #1D9E75;
+      --teal-stroke: #147a5a;
+      --purple: #7F77DD;
+      --purple-stroke: #665fc4;
+      --blue: #378ADD;
+      --blue-stroke: #2a6fb5;
+      --amber: #EF9F27;
+      --amber-stroke: #b97612;
+      --text: #1f1f1d;
+      --muted: #555550;
+      --package: #5d5d58;
+      --callout-bg: #fffdf7;
+      --callout-stroke: #b9b5aa;
+      --on-silicon: #1c1c1a;
+      --on-color: #ffffff;
+      --on-amber: #2b1a05;
+      --inset-bg: rgba(255, 255, 255, 0.5);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --silicon: #a7a79e;
+        --silicon-stroke: #c9c9c1;
+        --substrate: #a7a79e;
+        --substrate-stroke: #c9c9c1;
+        --text: #f4f4ef;
+        --muted: #cfcfc7;
+        --package: #c7c7be;
+        --callout-bg: #262624;
+        --callout-stroke: #6d6d66;
+        --on-silicon: #1b1b19;
+        --inset-bg: rgba(255, 255, 255, 0.06);
+      }
+    }
+    .main-title { fill: var(--text); font-size: 26px; font-weight: 700; }
+    .panel-title { fill: var(--text); font-size: 16px; font-weight: 700; }
+    .takeaway { fill: var(--text); font-size: 15px; font-weight: 600; }
+    .label { fill: var(--text); font-size: 14px; }
+    .label-bold { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .package-label { fill: var(--muted); font-size: 14px; font-weight: 600; }
+    .on-silicon { fill: var(--on-silicon); font-size: 14px; font-weight: 600; }
+    .on-color { fill: var(--on-color); font-size: 14px; font-weight: 600; }
+    .on-amber { fill: var(--on-amber); font-size: 14px; font-weight: 700; }
+    .dash-package { fill: none; stroke: var(--package); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .dash-inner { fill: var(--inset-bg); stroke: var(--package); stroke-width: 1.3; stroke-dasharray: 2 3; }
+    .dash-group { fill: none; stroke: var(--package); stroke-width: 1.4; stroke-dasharray: 5 4; }
+    .substrate { fill: var(--substrate); stroke: var(--substrate-stroke); stroke-width: 1; }
+    .silicon { fill: var(--silicon); stroke: var(--silicon-stroke); stroke-width: 1; }
+    .teal { fill: var(--teal); stroke: var(--teal-stroke); stroke-width: 1; }
+    .purple { fill: var(--purple); stroke: var(--purple-stroke); stroke-width: 1; }
+    .blue { fill: var(--blue); stroke: var(--blue-stroke); stroke-width: 1; }
+    .callout { fill: var(--callout-bg); stroke: var(--callout-stroke); stroke-width: 1; }
+    .laser { fill: var(--amber); stroke: var(--amber-stroke); stroke-width: 1; }
+    .fiber { fill: none; stroke: var(--amber); stroke-width: 2.2; stroke-linecap: round; }
+    .light { fill: none; stroke: var(--amber); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .leader { fill: none; stroke: var(--muted); stroke-width: 1.1; stroke-linecap: round; }
+    .leader-dash { fill: none; stroke: var(--muted); stroke-width: 1.1; stroke-dasharray: 3 3; stroke-linecap: round; }
+    .arrow-head { fill: var(--amber); }
+    .dot { fill: var(--muted); }
+  </style>
+  <defs>
+    <marker id="arrowAmber" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path class="arrow-head" d="M0,0 L6,3 L0,6 Z"/>
+    </marker>
+  </defs>
+
+  <text class="main-title" x="600" y="34" text-anchor="middle">Where does the photonic boundary sit?</text>
+
+  <!-- Panel A -->
+  <text class="panel-title" x="200" y="62" text-anchor="middle">Modular optical engine</text>
+  <text class="panel-title" x="200" y="82" text-anchor="middle">(Ayar Labs' approach)</text>
+
+  <rect class="dash-package" x="30" y="150" width="340" height="355" rx="8"/>
+  <text class="package-label" x="40" y="169">package</text>
+
+  <rect class="laser" x="110" y="96" width="180" height="36" rx="6"/>
+  <text class="on-amber" x="200" y="119" text-anchor="middle">External laser module</text>
+
+  <path class="light" d="M200 132 V250 M110 250 H290"/>
+  <path class="light" d="M110 250 V412" marker-end="url(#arrowAmber)"/>
+  <path class="light" d="M290 250 V412" marker-end="url(#arrowAmber)"/>
+
+  <rect class="substrate" x="45" y="470" width="310" height="16" rx="2"/>
+  <rect class="teal" x="63" y="416" width="70" height="54" rx="3"/>
+  <rect class="silicon" x="149" y="386" width="102" height="84" rx="3"/>
+  <rect class="teal" x="267" y="416" width="70" height="54" rx="3"/>
+  <rect class="teal" x="133" y="434" width="16" height="14" rx="2"/>
+  <rect class="teal" x="251" y="434" width="16" height="14" rx="2"/>
+
+  <text class="on-silicon" x="200" y="432" text-anchor="middle">XPU die</text>
+  <text class="on-color" x="98" y="431" text-anchor="middle">Optical</text>
+  <text class="on-color" x="98" y="447" text-anchor="middle">engine</text>
+  <text class="on-color" x="98" y="463" text-anchor="middle">chiplet</text>
+  <text class="on-color" x="302" y="431" text-anchor="middle">Optical</text>
+  <text class="on-color" x="302" y="447" text-anchor="middle">engine</text>
+  <text class="on-color" x="302" y="463" text-anchor="middle">chiplet</text>
+
+  <path class="leader" d="M141 368 H259 M141 368 V434 M259 368 V434"/>
+  <text class="label" x="200" y="358" text-anchor="middle">die-to-die link</text>
+
+  <path class="fiber" d="M63 446 C50 446 41 448 30 448"/>
+  <path class="fiber" d="M63 456 C50 456 40 454 30 454"/>
+  <path class="fiber" d="M337 446 C352 446 362 448 380 448"/>
+  <path class="fiber" d="M337 456 C352 456 364 454 380 454"/>
+
+  <rect class="callout" x="36" y="180" width="160" height="58" rx="6"/>
+  <text class="label" x="116" y="197" text-anchor="middle">Engine can be</text>
+  <text class="label" x="116" y="213" text-anchor="middle">screened before</text>
+  <text class="label" x="116" y="229" text-anchor="middle">attach</text>
+  <path class="leader" d="M48 238 L63 416"/>
+  <circle class="dot" cx="63" cy="416" r="2.2"/>
+
+  <rect class="callout" x="204" y="180" width="160" height="58" rx="6"/>
+  <text class="label" x="284" y="205" text-anchor="middle">Laser stays outside</text>
+  <text class="label" x="284" y="223" text-anchor="middle">the package</text>
+  <path class="leader" d="M284 180 V132"/>
+  <circle class="dot" cx="284" cy="132" r="2.2"/>
+
+  <text class="takeaway" x="200" y="552" text-anchor="middle">Risk split into small, screenable parts</text>
+
+  <!-- Panel B -->
+  <text class="panel-title" x="600" y="62" text-anchor="middle">Photonic interposer</text>
+  <text class="panel-title" x="600" y="82" text-anchor="middle">(Lightmatter's Passage approach)</text>
+
+  <rect class="dash-package" x="430" y="150" width="340" height="355" rx="8"/>
+  <text class="package-label" x="440" y="169">package</text>
+
+  <rect class="callout" x="440" y="184" width="320" height="32" rx="6"/>
+  <text class="label" x="600" y="205" text-anchor="middle">Optics and compute integrated as one stack</text>
+
+  <text class="label" x="450" y="248">I/O from the full die footprint,</text>
+  <text class="label" x="450" y="266">not just the edge</text>
+  <path class="leader-dash" d="M630 250 C670 320 710 390 742 438"/>
+  <circle class="dot" cx="742" cy="438" r="2.2"/>
+
+  <text class="label" x="450" y="320">Photonic interposer layer</text>
+  <path class="leader" d="M455 326 V438"/>
+  <circle class="dot" cx="455" cy="438" r="2.2"/>
+
+  <rect class="substrate" x="445" y="470" width="310" height="16" rx="2"/>
+  <rect class="purple" x="445" y="438" width="310" height="32" rx="3"/>
+
+  <g>
+    <path class="light" d="M462 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M497 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M532 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M567 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M602 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M637 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M672 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M707 466 V444" marker-end="url(#arrowAmber)"/>
+    <path class="light" d="M742 466 V444" marker-end="url(#arrowAmber)"/>
+  </g>
+
+  <rect class="silicon" x="535" y="354" width="130" height="84" rx="3"/>
+  <text class="on-silicon" x="600" y="398" text-anchor="middle">XPU die</text>
+
+  <path class="fiber" d="M445 452 C430 452 422 450 415 450"/>
+  <path class="fiber" d="M755 452 C770 452 778 450 785 450"/>
+
+  <text class="takeaway" x="600" y="552" text-anchor="middle">Risk concentrated in one integration step</text>
+
+  <!-- Panel C -->
+  <text class="panel-title" x="1000" y="62" text-anchor="middle">Owned: optics co-designed with the ASIC</text>
+  <text class="panel-title" x="1000" y="82" text-anchor="middle">(Marvell + Celestial AI approach)</text>
+
+  <rect class="dash-package" x="830" y="150" width="340" height="355" rx="8"/>
+  <text class="package-label" x="840" y="169">package</text>
+
+  <rect class="dash-inner" x="860" y="185" width="190" height="90" rx="6"/>
+  <rect class="silicon" x="890" y="220" width="34" height="34" rx="2"/>
+  <rect class="silicon" x="976" y="220" width="34" height="34" rx="2"/>
+  <rect class="blue" x="924" y="233" width="52" height="8" rx="2"/>
+  <text class="label" x="950" y="300" text-anchor="middle">Later: optics between dies</text>
+  <text class="label" x="950" y="318" text-anchor="middle">inside the package ('scale-in')</text>
+
+  <text class="label-bold" x="970" y="356" text-anchor="middle">designed together by one vendor</text>
+
+  <rect class="substrate" x="845" y="470" width="310" height="16" rx="2"/>
+  <rect class="dash-group" x="852" y="366" width="236" height="114" rx="8"/>
+  <rect class="silicon" x="870" y="386" width="100" height="84" rx="3"/>
+  <rect class="blue" x="990" y="406" width="90" height="64" rx="3"/>
+  <text class="on-silicon" x="920" y="432" text-anchor="middle">XPU die</text>
+  <text class="on-color" x="1035" y="431" text-anchor="middle">Optical</text>
+  <text class="on-color" x="1035" y="447" text-anchor="middle">chiplet</text>
+
+  <path class="fiber" d="M1080 444 C1100 444 1120 448 1178 448"/>
+
+  <text class="takeaway" x="1000" y="552" text-anchor="middle">Risk carried by one design owner</text>
+</svg>
