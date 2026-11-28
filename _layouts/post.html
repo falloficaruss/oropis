@@ -1,24 +1,38 @@
 ---
 layout: default
 ---
+{% if page.hero %}
+  <figure class="essay-hero">
+    <div class="essay-hero__media" style="background-image: url('{{ page.hero | relative_url }}');">
+      <div class="essay-hero__overlay">
+        <div class="essay-hero__content">
+          <h1 class="essay-hero__title">{{ page.title }}</h1>
+          {% if page.subtitle %}<p class="essay-hero__subtitle">{{ page.subtitle }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% if page.hero-credit %}
+      <figcaption class="essay-hero__credit">{{ page.hero-credit }}</figcaption>
+    {% endif %}
+  </figure>
+{% endif %}
+
 <article class="essay">
   {% if page.hero %}
-    <figure class="essay__hero">
-      <img src="{{ page.hero | relative_url }}" alt="" class="essay__hero-img">
-      {% if page.hero-credit %}
-        <figcaption class="essay__hero-credit">{{ page.hero-credit }}</figcaption>
-      {% endif %}
-    </figure>
-  {% endif %}
-
-  <header class="essay__header">
-    <div class="essay__meta">
+    <div class="essay__meta essay__meta--standalone">
       {% if page.pillar %}<span class="pillar-label">{{ page.pillar }}</span>{% endif %}
       <time class="mono" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
     </div>
-    <h1 class="essay__title">{{ page.title }}</h1>
-    {% if page.subtitle %}<p class="essay__subtitle">{{ page.subtitle }}</p>{% endif %}
-  </header>
+  {% else %}
+    <header class="essay__header">
+      <div class="essay__meta">
+        {% if page.pillar %}<span class="pillar-label">{{ page.pillar }}</span>{% endif %}
+        <time class="mono" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+      </div>
+      <h1 class="essay__title">{{ page.title }}</h1>
+      {% if page.subtitle %}<p class="essay__subtitle">{{ page.subtitle }}</p>{% endif %}
+    </header>
+  {% endif %}
 
   <div class="prose">
     {{ content }}

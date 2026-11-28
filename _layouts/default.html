@@ -37,10 +37,10 @@
     </script>
   {% endif %}
 </head>
-<body>
+<body{% if page.collection == 'posts' and page.hero %} class="has-hero-overlay"{% endif %}>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="masthead">
+  <header class="masthead{% if page.collection == 'posts' and page.hero %} masthead--overlay{% endif %}">
     <div class="masthead__inner">
       <div class="masthead__left">
         <button class="masthead__search-btn" aria-label="Search" onclick="document.querySelector('.search-overlay').classList.toggle('search-overlay--open')">
