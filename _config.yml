@@ -10,6 +10,8 @@ permalink: "/essays/:title/"
 plugins:
   - jekyll-feed
 
+future: true
+
 kramdown:
   math_engine: null
 
