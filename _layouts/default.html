@@ -42,16 +42,33 @@
 
   <header class="masthead">
     <div class="masthead__inner">
+      <div class="masthead__left">
+        <button class="masthead__search-btn" aria-label="Search" onclick="document.querySelector('.search-overlay').classList.toggle('search-overlay--open')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+
       <a class="masthead__title" href="{{ '/' | relative_url }}">
-        <img class="masthead__logo" src="{{ '/assets/images/oropis-wordmark.svg' | relative_url }}" alt="{{ site.title }}" width="54" height="18" style="height: 1.05rem; width: auto;">
+        <img class="masthead__logo" src="{{ '/assets/images/oropis-wordmark.svg' | relative_url }}" alt="{{ site.title }}">
       </a>
+
       <nav class="masthead__nav" aria-label="Primary">
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.collection == 'posts' %} aria-current="page"{% endif %}>Essays</a>
+        <span class="masthead__sep">/</span>
         <a href="{{ '/tracker/' | relative_url }}"{% if page.url == '/tracker/' %} aria-current="page"{% endif %}>Tracker</a>
+        <span class="masthead__sep">/</span>
         <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a>
       </nav>
     </div>
   </header>
+
+  <!-- Search overlay -->
+  <div class="search-overlay">
+    <div class="search-overlay__inner">
+      <input type="text" class="search-overlay__input" placeholder="Search Oropis…" id="search-input" autofocus>
+      <button class="search-overlay__close" onclick="document.querySelector('.search-overlay').classList.remove('search-overlay--open')" aria-label="Close search">✕</button>
+    </div>
+  </div>
 
   <main id="main" class="site-main">
     {{ content }}
@@ -59,7 +76,26 @@
 
   <footer class="site-footer">
     <div class="site-footer__inner">
-      <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }} · <a href="{{ '/feed.xml' | relative_url }}">RSS</a></p>
+      <div class="site-footer__columns">
+        <div class="site-footer__col">
+          <a href="{{ '/' | relative_url }}">Editorials</a>
+          <a href="{{ '/' | relative_url }}">Research</a>
+          <a href="{{ '/' | relative_url }}">Explainers</a>
+        </div>
+        <div class="site-footer__col">
+          <a href="{{ '/about/' | relative_url }}">About</a>
+          <a href="{{ '/contact/' | relative_url }}">Contact</a>
+          <a href="{{ '/support/' | relative_url }}">Support</a>
+        </div>
+        <div class="site-footer__col">
+          <a href="{{ '/feed.xml' | relative_url }}">RSS Feed</a>
+          <a href="{{ '/donate/' | relative_url }}">Donate</a>
+          <a href="{{ '/community-guidelines/' | relative_url }}">Community Guidelines</a>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+      </div>
     </div>
   </footer>
 </body>

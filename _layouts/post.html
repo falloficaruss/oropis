@@ -2,6 +2,15 @@
 layout: default
 ---
 <article class="essay">
+  {% if page.hero %}
+    <figure class="essay__hero">
+      <img src="{{ page.hero | relative_url }}" alt="" class="essay__hero-img">
+      {% if page.hero-credit %}
+        <figcaption class="essay__hero-credit">{{ page.hero-credit }}</figcaption>
+      {% endif %}
+    </figure>
+  {% endif %}
+
   <header class="essay__header">
     <div class="essay__meta">
       {% if page.pillar %}<span class="pillar-label">{{ page.pillar }}</span>{% endif %}

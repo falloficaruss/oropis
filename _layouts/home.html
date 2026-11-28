@@ -2,27 +2,55 @@
 layout: default
 ---
 <div class="home">
-  <header class="home__intro">
-    <h1 class="home__title">{{ site.title }}</h1>
-    <p class="home__description">{{ site.description }}</p>
-  </header>
+  {% assign sorted_posts = site.posts | sort: "date" | reverse %}
 
-  {% if site.posts.size > 0 %}
-    <section aria-labelledby="essays-heading">
-      <h2 class="section-label" id="essays-heading">Essays</h2>
-      <ul class="essay-list">
-        {% for post in site.posts %}
-          <li class="essay-list__item">
-            <div class="essay-list__meta">
-              {% if post.pillar %}<span class="pillar-label">{{ post.pillar }}</span>{% endif %}
-              <time class="mono" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+  {% if sorted_posts.size > 0 %}
+    {% assign latest = sorted_posts.first %}
+
+    <!-- Hero: latest post -->
+    <section class="hero">
+      <a href="{{ latest.url | relative_url }}" class="hero__link">
+        {% if latest.hero %}
+          <div class="hero__image" style="background-image: url('{{ latest.hero | relative_url }}');">
+        {% else %}
+          <div class="hero__image hero__image--placeholder">
+        {% endif %}
+            <div class="hero__overlay">
+              <h1 class="hero__title">{{ latest.title }}</h1>
+              {% if latest.subtitle %}<p class="hero__subtitle">{{ latest.subtitle }}</p>{% endif %}
             </div>
-            <h3 class="essay-list__title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-            {% if post.subtitle %}<p class="essay-list__subtitle">{{ post.subtitle }}</p>{% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+          </div>
+      </a>
     </section>
+
+    <!-- Post grid: remaining posts -->
+    {% assign remaining = sorted_posts | slice: 1, sorted_posts.size %}
+    {% if remaining.size > 0 %}
+      <section class="post-grid" aria-labelledby="more-heading">
+        <h2 class="visually-hidden" id="more-heading">More essays</h2>
+        <div class="post-grid__items">
+          {% for post in remaining %}
+            <article class="card">
+              <a href="{{ post.url | relative_url }}" class="card__image-link">
+                {% if post.hero %}
+                  <img class="card__image" src="{{ post.hero | relative_url }}" alt="" loading="lazy">
+                {% else %}
+                  <div class="card__image card__image--placeholder"></div>
+                {% endif %}
+              </a>
+              <div class="card__body">
+                {% if post.pillar %}
+                  <span class="card__pillar">{{ post.pillar }}</span>
+                {% endif %}
+                <h3 class="card__title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+                {% if post.subtitle %}<p class="card__subtitle">{{ post.subtitle }}</p>{% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
   {% else %}
     <p class="empty-state">Coming soon.</p>
   {% endif %}

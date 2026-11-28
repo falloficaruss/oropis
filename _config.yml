@@ -26,3 +26,5 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - vendor
+  - _hero
+  - _media
