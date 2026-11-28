@@ -52,6 +52,10 @@ a:hover {
   color: var(--accent-dark);
 }
 
+img {
+  max-width: 100%;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -113,7 +117,8 @@ a:hover {
 .masthead__logo {
   display: block;
   width: auto;
-  height: 1.15rem;
+  height: 1.05rem;
+  max-height: 1.25rem;
 }
 
 .masthead__nav {
