@@ -1,7 +1,7 @@
 ---
 title: "Where Should the Photonic Boundary Sit?"
 date: 2026-11-23 09:00:00 +0000
-pillar: "Company & Stack Audit"
+pillar: "Editorial"
 subtitle: "The photonic boundary will sit wherever one party is willing to guarantee packaging yield, and for the next two years that means modular optical engines (or optics co-designed by whoever owns the ASIC), not native photonic interposers, because only those let the risky parts be screened before they are bonded to the expensive die."
 math: false
 ---

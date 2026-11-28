@@ -42,7 +42,9 @@
 
   <header class="masthead">
     <div class="masthead__inner">
-      <a class="masthead__title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <a class="masthead__title" href="{{ '/' | relative_url }}">
+        <img class="masthead__logo" src="{{ '/assets/images/oropis-wordmark.svg' | relative_url }}" alt="{{ site.title }}" width="2168" height="725">
+      </a>
       <nav class="masthead__nav" aria-label="Primary">
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.collection == 'posts' %} aria-current="page"{% endif %}>Essays</a>
         <a href="{{ '/tracker/' | relative_url }}"{% if page.url == '/tracker/' %} aria-current="page"{% endif %}>Tracker</a>

@@ -92,7 +92,7 @@ a:hover {
 .masthead__inner {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem 2rem;
   max-width: var(--page);
@@ -101,16 +101,19 @@ a:hover {
 }
 
 .masthead__title {
+  display: block;
   color: var(--ink);
-  font-family: var(--serif);
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
   text-decoration: none;
 }
 
 .masthead__title:hover {
   color: var(--ink);
+}
+
+.masthead__logo {
+  display: block;
+  width: auto;
+  height: 1.75rem;
 }
 
 .masthead__nav {
