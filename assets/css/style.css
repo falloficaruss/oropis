@@ -9,7 +9,7 @@
   --serif: "Newsreader", Georgia, "Times New Roman", serif;
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  --measure: 680px;
+  --measure: 860px;
   --page: 1380px;
   --gutter: clamp(0.75rem, 2vw, 1.25rem);
 }
@@ -508,6 +508,11 @@ img {
   margin-bottom: 1.75rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--rule);
+}
+
+.essay .prose {
+  font-size: 1.28rem;
+  line-height: 1.72;
 }
 
 .essay__header {
